@@ -1,0 +1,33 @@
+{
+ "seed": 20261031,
+ "product_budget": 512,
+ "max_length": 766,
+ "overlap_removed": 0,
+ "label_mapping": "E -> Relevant; S, C, I -> Irrelevant",
+ "sets": {
+  "sft2": {
+   "rows": 10000,
+   "queries": 5000,
+   "rows_file_sha256": "00d35b223469c5689b93586725c71cd52dc2debea1954b1a4611610d388497a9",
+   "E": 4249
+  },
+  "diag": {
+   "rows": 3879,
+   "queries": 200,
+   "rows_file_sha256": "e9463d739ba244f0a4348569a48e235135049ac04bea264ebdac0d116556d665",
+   "E": 1620
+  },
+  "sel": {
+   "rows": 4047,
+   "queries": 200,
+   "rows_file_sha256": "20a3f71fad9089487acf2e7f0aed6a21376620dfc90421920584fe5863c2f597",
+   "E": 1816
+  },
+  "test300": {
+   "rows": 6078,
+   "queries": 300,
+   "rows_file_sha256": "a6f83c1c9e2431eefb250145b3acaafcc35c989caea1d4815df0d7b25f0672a1",
+   "E": 2857
+  }
+ }
+}

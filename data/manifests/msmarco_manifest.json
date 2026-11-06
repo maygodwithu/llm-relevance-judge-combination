@@ -1,0 +1,28 @@
+{
+ "train_pairs_file_sha256": "88e33812a0127fc2eef67f7d4fed11fe1087ad696ed51dac36bb5f3c4701af5b",
+ "train_rows": 10000,
+ "train_queries": 5000,
+ "years": {
+  "2019": {
+   "queries": 42,
+   "judged_pairs": 1102,
+   "pool_file_sha256": "5df686320a1b075bee4b833e0ce68abf92766c4f9ff99ce970c95f4f7303e56e",
+   "judged_id_sha256": "fc4dd0eeb94e6b2dd2f00e6fd33e8960d96b02fbdafd1577a770174238debfff"
+  },
+  "2020": {
+   "queries": 54,
+   "judged_pairs": 1432,
+   "pool_file_sha256": "b8e026fec9c284018b04bc1b0e9cd2cc2beaccf9e82f95f7c66734741a61a949",
+   "judged_id_sha256": "65f2367a38cd43d345ab3ef7cdc6e0d56d2f3d90e2447484a84cf604155fa158"
+  }
+ },
+ "qwen_passage_cache": {
+  "entries": 10000,
+  "content_sha256": "6a079afd24c12a4fdf2904b7e090f250fea567a42c5f6ec50d48b99153c07b9e",
+  "max_length": 384,
+  "tokenizer_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+  "enable_thinking": "false",
+  "corpus_version": "ir_datasets:msmarco-passage@ir_datasets-0.6.3,docs_count=8841823",
+  "selection_seed": 0
+ }
+}

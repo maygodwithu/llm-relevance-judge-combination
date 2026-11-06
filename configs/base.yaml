@@ -1,0 +1,50 @@
+# 3.1(Instruction Adequacy Diagnosis) 학습 루프 기본 설정값.
+# 논문 4.2 하이퍼파라미터를 따르되, 데이터 규모가 작으므로 K/M/threshold는
+# 소규모 실행에서 관찰한 값으로 조정 가능하게 남겨둔다.
+
+model_name: "Qwen/Qwen3-4B"
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+optim:
+  lr: 2.0e-5
+  warmup_ratio: 0.1
+  epochs: 3
+  train_batch_size: 2
+  diag_batch_size: 2
+
+diagnostic:
+  # K = max(1, floor(T/10))  (T: 전체 optimizer-update step 수, 실행 시 계산)
+  M: 1                # 연속 트리거 필요 체크포인트 수 (식 15).
+                        # 논문 기본값은 M=2(일시적 노이즈 방지)이지만, budget=256
+                        # 실행에서 diagnostic set(170개)이 작아 G가 체크포인트마다
+                        # 크게 출렁여 M=2일 때 트리거가 step684까지 과도하게 지연됨
+                        # (재계산 검증: M=1이면 step228, M=2면 step684, under 기준).
+                        # 반응성을 우선해 M=1로 설정 — 대신 diagnostic set을 키우거나
+                        # (budget 확대) 노이즈가 줄어들면 M=2로 되돌리는 것을 고려할 것.
+  beta: 0.9            # pressure EMA 계수 (식 9)
+  eps: 1.0e-8
+  tau_inst: 0.6         # instruction-pressure threshold (식 14) — 소규모 실행값, 조정 가능
+  tau_gain: 0.02        # marginal-gain threshold (식 14) — 소규모 실행값, 조정 가능
+  beta_a: 0.9           # 토큰별 gradient EMA 계수 (식 16)
+  # rewriting 채택 방식: frozen-checkpoint 즉시 loss 비교(식21~23)로 accept/reject
+  # 하던 방식을 실험적으로 변경 — 트리거되면 무조건 적용하고, 대신 아래 개수만큼
+  # 체크포인트 동안 재트리거를 쉬어(protect) 모델이 새 instruction에 적응할
+  # 시간을 준다(사용자 관찰: frozen weight로 즉시 비교하면 "이미 기존 instruction에
+  # 맞춰진 가중치" 때문에 의미적으로 더 나은 instruction도 불리하게 평가될 수 있음).
+  protect_checkpoints: 1
+
+rewriter:
+  max_new_tokens: 200
+  backend: openai        # "local"(Qwen3-4B, disable_adapter) 또는 "openai"
+  openai_model: gpt-4o
+  api_key_path: apikey.txt
+
+data:
+  max_length: 384
+
+seed: 0

@@ -1,0 +1,28 @@
+# Group 3 (model-family generalization): google/gemma-3-4b-it, 4.3B params -- closest
+# available scale match to Qwen3-4B (4.0B) tested for this project. gemma-3-4b-it is a
+# multimodal (vision+language) wrapper (Gemma3ForConditionalGeneration): plain
+# "q_proj"/"k_proj"/"v_proj"/"o_proj" substring target_modules would also match the
+# vision_tower's identically-named attention projections (confirmed via a direct sanity
+# check: 61 total q_proj modules, 34 language_model + 27 vision_tower), so
+# target_modules here is a regex restricted to model.language_model.layers.N.self_attn.
+# num_hidden_layers is not at model.config.num_hidden_layers for this architecture --
+# it's under model.config.text_config.num_hidden_layers (34); repreg.py's
+# rep_layer_indices() already handles this fallback.
+
+model_name: "google/gemma-3-4b-it"
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: 'model\.language_model\.layers\.\d+\.self_attn\.[qkvo]_proj'
+
+optim:
+  lr: 2.0e-5
+  warmup_ratio: 0.1
+  train_batch_size: 2
+
+data:
+  max_length: 704
+
+seed: 0
