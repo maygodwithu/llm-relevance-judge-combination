@@ -1,0 +1,54 @@
+{
+ "note": "ESCI-T1..T7 of experiment log 162, frozen before any score; common suffix after a blank line",
+ "entries": [
+  {
+   "display_id": "T1",
+   "source_id": "ESCI-T1",
+   "full": "Determine whether the product is an exact match for the query, using the provided product information. Label it Relevant only if it matches the requested product and meets all requirements stated in the query. Label substitutes, complementary products, and unrelated products Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "ed27ca324982e063a6040447b88b76e5241d5b290bea42d532540fb974618734",
+   "tokens_with_suffix": 64
+  },
+  {
+   "display_id": "T2",
+   "source_id": "ESCI-T2",
+   "full": "Compare the product information with what the query asks for. A product is Relevant when it is the requested product and satisfies every stated requirement. A substitute, an item intended to accompany the requested product, or an unrelated item is Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "ad4c32aac10921d6ce3eb833196052d31d58280e5988b73494be09a74d83c5d7",
+   "tokens_with_suffix": 61
+  },
+  {
+   "display_id": "T3",
+   "source_id": "ESCI-T3",
+   "full": "Decide whether the product fulfills the query exactly. Use Relevant for the requested product when all specified requirements are met. Use Irrelevant for substitutes, complementary items, unrelated items, and products that fail a specified requirement. Base the decision on the supplied product information.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "57c5bd57e26e74a9f37868e7cebcf8201d12144c5978d11034c5e1ae939f8ea8",
+   "tokens_with_suffix": 67
+  },
+  {
+   "display_id": "T4",
+   "source_id": "ESCI-T4",
+   "full": "Assess the match between the query and the product described. To be Relevant, the product must match what is requested and meet all explicitly stated requirements. Products offered as alternatives or complements, as well as unrelated products, are Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "bf232eff7a3c841270adce2f358c08742e86a63b9c2ed7859bc6cbf723843572",
+   "tokens_with_suffix": 62
+  },
+  {
+   "display_id": "T5",
+   "source_id": "ESCI-T5",
+   "full": "Using the product details, check whether this is the product sought by the query with all requested requirements satisfied. If so, classify it as Relevant. If it is a substitute, a complementary product, an unrelated product, or fails a requested requirement, classify it as Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "9cefe125cc442e1793e332b5c2577b38e0dbf131fd85738e48d2aac772e95f27",
+   "tokens_with_suffix": 69
+  },
+  {
+   "display_id": "T6",
+   "source_id": "ESCI-T6",
+   "full": "For this query–product pair, assign Relevant only to an exact match: the requested product satisfying all requirements expressed in the query. Assign Irrelevant to substitutes, complementary products, unrelated products, and matches that do not satisfy those requirements. Judge from the provided product information.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "5da0eaab8bf274866047f9fed99c981f1d8d2e059be2f20488e54f9bf85ba418",
+   "tokens_with_suffix": 68
+  },
+  {
+   "display_id": "T7",
+   "source_id": "ESCI-T7",
+   "full": "Evaluate whether the supplied product information describes an exact match to the user's query. The requested product meeting every stated requirement is Relevant. A substitute, a product used alongside it, an unrelated product, or a product missing a required attribute is Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+   "sha256_full": "d93940b1de033d01835dd6ba3ef6d383bec68476dcf4fa3f029e6f0320a93a0a",
+   "tokens_with_suffix": 64
+  }
+ ]
+}

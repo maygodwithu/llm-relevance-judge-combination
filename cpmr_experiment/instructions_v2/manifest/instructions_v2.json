@@ -1,0 +1,202 @@
+{
+  "version": "v2-draft-1",
+  "lock_status": "draft",
+  "blocking_for_lock": [
+    "real-case qrels review on MS MARCO (partially done, n=6 queries) and HotpotQA (not started)",
+    "real-case qrels review on NQ, FiQA, NFCorpus, SciFact -- including SciFact support/refute and NFCorpus graded-relevance boundary cases (not started; candidate pools are server-side)",
+    "tokenizer measurement of per-prompt prefix token length (no tokenizer in the local mirror)",
+    "rendering/tokenization audit with the v2 set (render_check_v2.py written, never run)",
+    "passage-invariance verification over real query-passage pairs (build_passage_cache.py written, never run)",
+    "max_length decision from the C1 truncation measurement"
+  ],
+  "generated_by": "cpmr_experiment/instructions_v2/scripts/build_manifest.py",
+  "output_suffix": "\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+  "output_suffix_sha256": "8692a7228a8bc2ad169b12ea943d4a420d48d04bcde671e04475d3c82aefd126",
+  "canonical": "T1",
+  "instruction_field_boundary": "The instruction field carries body + OUTPUT_SUFFIX and NOTHING else. 'Query:' and 'Passage:' are added exactly once by the builder (src/data_mistral.py:30 adds 'Query: ', and the passage text already carries the 'Passage: ' prefix in the training jsonl / is given it by the evaluator at src/eval_rerank_mistral.py:33).",
+  "label_strings": {
+    "positive": "Relevant",
+    "negative": "Irrelevant"
+  },
+  "name_map_v1_to_v2": {
+    "condition": {
+      "FixedOnly-Rank-K2 (v1)": "FixedCanonical-K2 (v2)"
+    },
+    "prompt_key": {
+      "only (v1 canonical)": "T1 (v2 canonical)"
+    },
+    "note": "v1 prompts differed by a single adverb and were token-length identical (model_tokenizer_prompt_audit.json: token_length_diffs_vs_only all 0, prefix 65 tokens). v2 prompts are paraphrases and are NOT length matched; the length confound is handled by passage invariance, not by length matching."
+  },
+  "roll_up_sha256": "d4eb8d51332681d68755499ce3f0e1333bb1c9e95df746e3a5b4aa84b187f788",
+  "entries": {
+    "T1": {
+      "role": "TRAIN",
+      "is_canonical": true,
+      "body": "Judge whether the passage provides information that addresses the information need expressed in the query. A passage is relevant even if it addresses that need only in part. Sharing the topic alone is not sufficient.",
+      "full": "Judge whether the passage provides information that addresses the information need expressed in the query. A passage is relevant even if it addresses that need only in part. Sharing the topic alone is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "cc157cdb5e319c4e501c4814f2c93813320b25f9a33bfa905189ab3ab792a5da",
+      "sha256_full": "5c36766c18fafcd6dee1236c93482dab8aed96470e1d986818e80e932527b62d",
+      "is_ascii": true,
+      "n_chars_body": 216,
+      "n_chars_full": 271,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "T2": {
+      "role": "TRAIN",
+      "is_canonical": false,
+      "body": "Decide whether the passage supplies information that addresses the query's information need. Information that addresses only part of that need is still relevant. A passage that only shares the query's topic is not relevant.",
+      "full": "Decide whether the passage supplies information that addresses the query's information need. Information that addresses only part of that need is still relevant. A passage that only shares the query's topic is not relevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "b47174d211c45566dd8bdbae25d830f61267d5603bfa265e4b7b1c9894174042",
+      "sha256_full": "612e65322944d06ff90f2bc40da82fc6833000389a49d2db93e58eb4849395a2",
+      "is_ascii": true,
+      "n_chars_body": 223,
+      "n_chars_full": 278,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "T3": {
+      "role": "TRAIN",
+      "is_canonical": false,
+      "body": "Your task is to decide whether the passage contributes information that addresses the query's information need. Information that usefully addresses part of that need counts as relevant. Topical overlap by itself does not make a passage relevant.",
+      "full": "Your task is to decide whether the passage contributes information that addresses the query's information need. Information that usefully addresses part of that need counts as relevant. Topical overlap by itself does not make a passage relevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "343f918639bbed5fd86e80bf72b0e302b37b5d1e7c03707b3fa4842475b04524",
+      "sha256_full": "de0d31e8247ece71545491629f0d3c74022e45a66ee2dca8cf2ecaba68e82ee4",
+      "is_ascii": true,
+      "n_chars_body": 245,
+      "n_chars_full": 300,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "T4": {
+      "role": "TRAIN",
+      "is_canonical": false,
+      "body": "Determine whether the passage offers information that addresses the information need the query expresses. Relevance does not require addressing the need completely. Having the same topic is not sufficient on its own.",
+      "full": "Determine whether the passage offers information that addresses the information need the query expresses. Relevance does not require addressing the need completely. Having the same topic is not sufficient on its own.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "318226d61a77119009aa5ff0425be6746fba8808371a50989b37872006ec2b03",
+      "sha256_full": "eb5fa215c6a1ade9b116b3551c69b610c5c5a637cca619621e0608b1a7b6f20a",
+      "is_ascii": true,
+      "n_chars_body": 216,
+      "n_chars_full": 271,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "T5": {
+      "role": "TRAIN",
+      "is_canonical": false,
+      "body": "Mark the passage relevant when it carries information that addresses the information need expressed in the query, including when it addresses only part of that need. Do not mark it relevant for topical overlap alone.",
+      "full": "Mark the passage relevant when it carries information that addresses the information need expressed in the query, including when it addresses only part of that need. Do not mark it relevant for topical overlap alone.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "b622c4a295c814d912f3882277b8e0068d264c130fbe24af7b647adb2898d345",
+      "sha256_full": "965f7bb0bafca291f3c0953d33aaa7aaf0467ec631be4d4c3550a8eef57165af",
+      "is_ascii": true,
+      "n_chars_body": 216,
+      "n_chars_full": 271,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "D1": {
+      "role": "DEV",
+      "is_canonical": false,
+      "body": "Consider the information need expressed in the query and decide whether the passage provides information that addresses it. Information addressing only part of the need is relevant. Topical overlap alone is not.",
+      "full": "Consider the information need expressed in the query and decide whether the passage provides information that addresses it. Information addressing only part of the need is relevant. Topical overlap alone is not.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "7dc56586945b4342535a0107bfd0785666d213665ea3368443f76604f02e1e80",
+      "sha256_full": "d3cdc7b19243e8acfc25efeb1eecd4101d6efa61b87d7ccdd59165b6acc9aa0f",
+      "is_ascii": true,
+      "n_chars_body": 211,
+      "n_chars_full": 266,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "D2": {
+      "role": "DEV",
+      "is_canonical": false,
+      "body": "Decide whether the passage gives information that addresses the information need expressed in the query. A passage that addresses the need only partly is still relevant. Sharing the subject alone is not enough.",
+      "full": "Decide whether the passage gives information that addresses the information need expressed in the query. A passage that addresses the need only partly is still relevant. Sharing the subject alone is not enough.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "b471831d278d798a969d0da4275ed23d58c69ce6a185167ef640c882888f9fd4",
+      "sha256_full": "7bf195f0b1d46158545bf68780d2710e1a453eb6411c362fe993a1e70def97b8",
+      "is_ascii": true,
+      "n_chars_body": 210,
+      "n_chars_full": 265,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "D3": {
+      "role": "DEV",
+      "is_canonical": false,
+      "body": "Judge the passage against the query's information need. A passage that provides information addressing that need is relevant, including when it addresses only part of it. Subject overlap by itself is not sufficient.",
+      "full": "Judge the passage against the query's information need. A passage that provides information addressing that need is relevant, including when it addresses only part of it. Subject overlap by itself is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "8e2aedc9741b766ca11845778de8b4be2439b9ba5c34a929a35562f275d7a94e",
+      "sha256_full": "c2a3903d08a43b6f06bd206232b21185afea6e7d117c63089623bb2f4198d537",
+      "is_ascii": true,
+      "n_chars_body": 215,
+      "n_chars_full": 270,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "E1": {
+      "role": "TEST",
+      "is_canonical": false,
+      "body": "Examine the passage and decide whether it provides information that addresses the information need expressed in the query. Addressing only part of the need still counts as relevant. Sharing the topic alone does not.",
+      "full": "Examine the passage and decide whether it provides information that addresses the information need expressed in the query. Addressing only part of the need still counts as relevant. Sharing the topic alone does not.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "e5b2426f89591d3e66f042744de6e13f89b1dc4018796a58006858d892042b9d",
+      "sha256_full": "e259af1b075e088aba01dc22026b44bd9ce9041229eb4c0092cd265cce27caab",
+      "is_ascii": true,
+      "n_chars_body": 215,
+      "n_chars_full": 270,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "E2": {
+      "role": "TEST",
+      "is_canonical": false,
+      "body": "Determine whether the passage states information that addresses the information need expressed in the query. A passage addressing part of that need is relevant. Belonging to the same topic is not sufficient.",
+      "full": "Determine whether the passage states information that addresses the information need expressed in the query. A passage addressing part of that need is relevant. Belonging to the same topic is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "e1f63135c3e24c2b579f03fd2bcb940fd34df8eba745f58022693a9efe0f0774",
+      "sha256_full": "46f64bf83a5d00438610cf9bbafed999a80c67da7591f3fd96f6ee076506c7da",
+      "is_ascii": true,
+      "n_chars_body": 207,
+      "n_chars_full": 262,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "E3": {
+      "role": "TEST",
+      "is_canonical": false,
+      "body": "Decide whether the passage presents information that addresses the query's information need. Partial treatment of the need is still relevant. A passage that only shares the topic is not relevant.",
+      "full": "Decide whether the passage presents information that addresses the query's information need. Partial treatment of the need is still relevant. A passage that only shares the topic is not relevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "e6cb3f740c04c9a27f241dd39274c7567feb45439005ff01a8c26b55258e5f5f",
+      "sha256_full": "2795537906397679b4e1b1b51568708cd1dfe1ea1c4c7bbff5aef95c96f8995a",
+      "is_ascii": true,
+      "n_chars_body": 195,
+      "n_chars_full": 250,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "E4": {
+      "role": "TEST",
+      "is_canonical": false,
+      "body": "Judge whether the passage includes information that addresses the information need the query expresses. Relevance does not require addressing the need in full. Topical similarity on its own is not enough.",
+      "full": "Judge whether the passage includes information that addresses the information need the query expresses. Relevance does not require addressing the need in full. Topical similarity on its own is not enough.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "7c01a82b4c45636390ba5010c7724749e3e8bf5267f406b2d659f07a7a8f988c",
+      "sha256_full": "29a035eec47fa224f1493de9dc6f8da852d548e49a1e00e4a27ef8f85808f577",
+      "is_ascii": true,
+      "n_chars_body": 204,
+      "n_chars_full": 259,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    },
+    "E5": {
+      "role": "TEST",
+      "is_canonical": false,
+      "body": "Assess whether the passage delivers information that addresses the information need expressed in the query. Relevance does not require addressing the need in full. Sharing the subject alone is not sufficient.",
+      "full": "Assess whether the passage delivers information that addresses the information need expressed in the query. Relevance does not require addressing the need in full. Sharing the subject alone is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+      "sha256_body": "0510e78e653e092678085e20c77f0ab7323754eaaea1159359c90487e9b8d443",
+      "sha256_full": "687defaa49c623f5bc4a42f8081cc5e42053ea3bed3b6a8f5d0c9f5b0691a0e3",
+      "is_ascii": true,
+      "n_chars_body": 208,
+      "n_chars_full": 263,
+      "n_tokens_prefix": null,
+      "n_tokens_measured_with": null
+    }
+  }
+}

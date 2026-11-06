@@ -1,0 +1,14 @@
+# ESCI extension (experiment log 156): Qwen/Qwen3-4B (post-trained, revision 1cfa9a72; local weights verified against the Hub hashes). LoRA r8/alpha16/dropout .05 on the decoder q/k/v/o (144 modules, 5,898,240 parameters), AdamW lr 2e-5, warm-up ceil(0.1 B), max_length from cpmr_experiment/esci/audit/splits.json (no truncation by construction).
+model_name: "Qwen/Qwen3-4B"
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+optim:
+  lr: 2.0e-5
+  warmup_ratio: 0.1
+  train_batch_size: 16
+data:
+  max_length: 766
+seed: 0

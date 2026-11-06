@@ -1,0 +1,15 @@
+# restored inputs, run outputs and secrets are never committed
+cpmr_experiment/esci/audit/
+cpmr_experiment/**/train/
+cpmr_experiment/**/eval/
+cpmr_experiment/**/out/
+cpmr_experiment/instructions_v2/cache_5k/
+cpmr_experiment/instructions_v2/audit_5k/
+data/msmarco_train_v2_5k/
+data/scenarios/
+*.pt
+*.safetensors
+*.pkl
+apikey.txt
+__pycache__/
+*.pyc

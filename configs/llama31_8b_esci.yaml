@@ -1,0 +1,14 @@
+# experiment log 166: Llama-3.1-8B-Instruct (revision 0e9e39f2, the checkpoint of the MS MARCO runs 144/160/164), LlamaForCausalLM, local snapshot of the second server. LoRA r8/alpha16/dropout .05 on q/k/v/o (128 modules, 6,815,744 parameters), AdamW lr 2e-5, warm-up ceil(0.1 B); max_length in cpmr_experiment/esci_llama/audit/max_length.json.
+model_name: "meta-llama/Llama-3.1-8B-Instruct"
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+optim:
+  lr: 2.0e-5
+  warmup_ratio: 0.1
+  train_batch_size: 16
+data:
+  max_length: 0
+seed: 0

@@ -1,0 +1,15 @@
+{
+ "max_length": 981,
+ "empty_instruction_longest": 825,
+ "reserve": 145,
+ "per_T_longest": {
+  "T1": 892,
+  "T2": 889,
+  "T3": 895,
+  "T4": 890,
+  "T5": 897,
+  "T6": 896,
+  "T7": 892
+ },
+ "model_snapshot": "0e9e39f249a16976918f6564b8830bc894c89659"
+}

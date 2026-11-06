@@ -1,0 +1,4 @@
+{
+ "T6": "Determine whether the passage supplies information that meets the information need stated in the query. Meeting only part of that need is enough for relevance. Merely discussing the same topic is not enough.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T7": "Read the query and assess the passage against its information need. Treat the passage as relevant if it provides information addressing all or part of that need. Do not treat a shared topic alone as evidence of relevance.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."
+}

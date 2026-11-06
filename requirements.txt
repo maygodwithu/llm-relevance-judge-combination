@@ -1,0 +1,17 @@
+# versions used for the experiments of the paper (Python 3.12.13)
+torch==2.13.0
+transformers==4.57.6
+peft==0.20.0
+accelerate==1.14.0
+tokenizers==0.22.2
+safetensors==0.8.0
+numpy==2.5.1
+scipy==1.18.0
+pandas==3.0.3
+pyarrow==25.0.0
+PyYAML==6.0.3
+scikit-learn==1.9.0
+matplotlib==3.11.1
+ir_datasets==0.6.3
+ranx==0.3.21
+rank-bm25==0.2.2

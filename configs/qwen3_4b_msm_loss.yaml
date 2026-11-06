@@ -1,0 +1,36 @@
+# 2x2 difficulty pilot (basic/hard x FixedCanonical-K2/Multi5-Rank-K2), Qwen3-4B.
+#
+# Identical to configs/qwen3_4b_cpmr_pilot.yaml except gradient_checkpointing. That file is left
+# untouched because prior runs and the step-0 difficulty diagnostic used it.
+#
+# Why checkpointing is needed here: the CPMR-family losses keep all K*2*2 = 8 forward graphs of a
+# query-group alive until one backward(), and the v2 instructions are ~110 characters longer than
+# the v1 adverb prompts, which pushed the peak past a 24 GB card. Measured: three runs reached
+# 22.83 GiB genuinely allocated (only 342 MiB reserved-but-unallocated, so not fragmentation) and
+# died at step 225/625. Checkpointing recomputes activations in backward instead of storing them;
+# src/model.py records ~24.6 -> ~18.7 GB reserved for this trade.
+#
+# It is mathematically neutral -- the gradients are the same -- but it consumes RNG differently, so
+# a run under this config is not bitwise comparable with one under the other config even at the
+# same seed. All four conditions of the pilot use this file, so the comparison between them is
+# unaffected.
+
+model_name: "Qwen/Qwen3-4B"   # local copy of Qwen/Qwen3-4B revision 1cfa9a72 (model.safetensors.index.json sha256 6dc0981b..., same as the first server)
+
+gradient_checkpointing: true
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+
+optim:
+  lr: 2.0e-5
+  warmup_ratio: 0.1
+  train_batch_size: 2
+
+data:
+  max_length: 384
+
+seed: 0
