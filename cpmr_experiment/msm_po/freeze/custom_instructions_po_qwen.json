@@ -1,0 +1,9 @@
+{
+ "T1_APOCF": "Judge whether the passage directly addresses the query's information need. A passage is relevant only if it provides direct, complete information to answer the query.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T2_APOCF": "Decide whether the passage directly addresses the query's main question. Partial answers or tangential information that doesn't directly respond to the query's core need are considered irrelevant. A passage that only mentions the query's topic without providing additional relevant information is not relevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T3_APOCF": "Your task is to decide whether the passage directly and substantially addresses the query. Partial answers or indirect references are not sufficient. Information that only overlaps in topic without providing useful content toward the query's goal is considered irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T4_APOCF": "Determine if the passage directly addresses the query's key question. Partial answers or related topics are not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T5_APOCF": "Mark the passage relevant if it directly addresses the query's main question, even if only partially. Do not consider topical overlap alone.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T6_APOCF": "Determine whether the passage directly addresses the query's key information. A passage is relevant if it provides the essential details needed to answer the query. Partially relevant or tangentially related content is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\".",
+ "T7_APOCF": "Read the query and assess the passage. Classify as Relevant if it directly addresses the query's need; otherwise, mark as Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."
+}

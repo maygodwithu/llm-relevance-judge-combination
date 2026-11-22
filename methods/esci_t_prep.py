@@ -1,4 +1,4 @@
-"""ESCI-T1..T7 preparation (experiment log 162; CPU only, no model score): frozen ESCI-T manifest (full text + common suffix, tokens, sha256), identity check of the frozen 159/161 row files, and an exact prompt-length check of every T on every row
+"""ESCI-T1..T7 preparation (CPU only, no model score): frozen ESCI-T manifest (full text + common suffix, tokens, sha256), identity check of the frozen 159/161 row files, and an exact prompt-length check of every T on every row
 (user turn = '<instruction>\\n\\nQuery: <query>\\n<product block>' through the official chat template with enable_thinking=False, + the longer answer 'Irrelevant' + <|im_end|>) against the frozen max_length 766.
     python methods/esci_t_prep.py cpmr_experiment/esci_t"""
 import hashlib
@@ -44,7 +44,7 @@ for k, v in T.items():
     n = len(tok(full, add_special_tokens=False)["input_ids"])
     entries.append({"display_id": k, "source_id": f"ESCI-{k}", "full": full, "sha256_full": sha(full), "tokens_with_suffix": n})
     P(f"ESCI-{k}: {n} tokens with suffix, sha256 {sha(full)[:16]}..")
-(OUT / "esci_t_manifest.json").write_text(json.dumps({"note": "ESCI-T1..T7 of experiment log 162, frozen before any score; common suffix after a blank line", "entries": entries}, indent=1, ensure_ascii=False), encoding="utf-8")
+(OUT / "esci_t_manifest.json").write_text(json.dumps({"note": "ESCI-T1..T7, frozen before any score; common suffix after a blank line", "entries": entries}, indent=1, ensure_ascii=False), encoding="utf-8")
 max_len = json.load(open(A / "splits.json", encoding="utf-8"))["max_length"]
 ans = tok("Irrelevant", add_special_tokens=False)["input_ids"]
 P(f"\nframe max_length {max_len}; answer 'Irrelevant' = {len(ans)} tokens + <|im_end|>")

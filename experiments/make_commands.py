@@ -2,8 +2,11 @@
     python experiments/make_commands.py --model qwen --dataset esci --paths ce,soft,any --instr 1-7 --seeds 0,1,2 [--stage train|eval|prep|all] [--gpu 0]
     python experiments/make_commands.py --all --out experiments/commands          (one file per model and dataset)
     python experiments/make_commands.py --pilot245 | --gemma-fp32
+Stages: prep (checkpoint map, optional PO regeneration), train, eval (the evaluation sets of the paper: ESCI sel + test300, MS MARCO TREC-DL 2019 + 2020), val (MS MARCO only: scores of every model on the validation set val200, from which the main-protocol thresholds are selected), all.
 Conditions ("paths"):  base  = no fine-tuning;  ce = token CE;  soft = CE + 1.0 soft kappa;  any = CE + 1.0 AnyLoss-style kappa (alpha 10);
-                       po-base / po-ce / po-soft = the same with the APO-CF-selected instruction (ESCI, Qwen3-4B and Llama-3.1-8B-Instruct, T1-T3; Llama keeps the original text for T1, so only T2 and T3 are separate runs).
+                       po-base / po-ce / po-soft = the same with the APO-CF-selected instruction. PO exists for Qwen3-4B and Llama-3.1-8B-Instruct on ESCI and MS MARCO, T1-T7 (not for Gemma). The selection kept the original text for
+                       some instructions; those are not separate runs (the PO result is the original result): Qwen ESCI and Qwen MS MARCO: none kept (T1-T7 all changed); Llama ESCI: T1, T4, T6 kept (T2, T3, T5, T7 changed);
+                       Llama MS MARCO: T1, T4-T7 kept (T2, T3 changed). The commands are generated for the changed instructions only; see docs/PO_SELECTION.md.
 Seeds 0, 1, 2; 625 updates; effective batch 16 (ESCI) / 8 query pairs = 16 sequences (MS MARCO); the final checkpoint only is evaluated.
 The output directories follow the original run layout under cpmr_experiment/; the analysis loaders find the score files by name (cpmr_experiment/**/esciEval_*, msmEval_*, ...)."""
 import argparse
@@ -17,8 +20,8 @@ CUSTOM = "methods/custom_instructions_T6_T7.json"
 
 def esci_cfg(m):
     return {
-        "qwen": dict(root="esci_t", ce_train="methods/esci_train.py", mix_train="methods/esci_loss_train_245.py", ev="methods/esci_eval.py", ce_tag="E4_{i}_s{s}", mix_prefix="EQ", mix_root="esci_mix", po=(1, 2, 3), p1="methods/esci_apocf_p1.py", ce_is_mix=False),
-        "llama": dict(root="esci_llama", ce_train="methods/esci_llama_train.py", mix_train="methods/esci_llama_loss_train_mix.py", ev="methods/esci_llama_eval.py", ce_tag="EL_{i}_s{s}", mix_prefix="ELQ", mix_root="esci_llama", po=(2, 3), p1="methods/esci_llama_apocf_p1.py", ce_is_mix=False),
+        "qwen": dict(root="esci_t", ce_train="methods/esci_train.py", mix_train="methods/esci_loss_train_245.py", ev="methods/esci_eval.py", ce_tag="E4_{i}_s{s}", mix_prefix="EQ", mix_root="esci_mix", po=(1, 2, 3, 4, 5, 6, 7), p1="methods/esci_apocf_p1.py", ce_is_mix=False),
+        "llama": dict(root="esci_llama", ce_train="methods/esci_llama_train.py", mix_train="methods/esci_llama_loss_train_mix.py", ev="methods/esci_llama_eval.py", ce_tag="EL_{i}_s{s}", mix_prefix="ELQ", mix_root="esci_llama", po=(2, 3, 5, 7), p1="methods/esci_llama_apocf_p1.py", ce_is_mix=False),
         "gemma": dict(root="esci_gemma", ce_train="methods/esci_gemma_loss_train_mix.py", mix_train="methods/esci_gemma_loss_train_mix.py", ev="methods/esci_gemma_eval.py", ce_tag="GQ_ce_{i}_s{s}", mix_prefix="GQ", mix_root="esci_gemma", po=(), p1=None, ce_is_mix=True),
     }[m]
 
@@ -81,13 +84,20 @@ def esci(m, paths, instr, seeds, stage, gpu):
     return out
 
 
+FREEZE = f"{C}/msm_po/freeze"
+MS_PO_T = {"qwen": (1, 2, 3, 4, 5, 6, 7), "llama": (2, 3), "gemma": ()}      # instructions whose PO-selected text differs from the original (the others reuse the original runs)
+
+
 def msm(m, paths, instr, seeds, stage, gpu):
     g = f"CUDA_VISIBLE_DEVICES={gpu} python"
-    cfg = {"qwen": dict(root="msm_t7", train="methods/msm_loss_train4.py", ev="methods/msm_final_eval2.py", config="configs/qwen3_4b_msm_loss.yaml", tag="msq_{l}_T{T}_s{s}"),
-           "llama": dict(root="msm_llama", train="methods/msm_llama_loss_train.py", ev="methods/msm_llama_eval.py", config="configs/llama31_8b_msm.yaml", tag="mlq_{l}_T{T}_s{s}"),
-           "gemma": dict(root="msm_gemma", train="methods/msm_gemma_loss_train.py", ev="methods/msm_gemma_eval.py", config="configs/gemma3_4b_msm.yaml", tag="gmq_{l}_T{T}_s{s}")}[m]
+    cfg = {"qwen": dict(root="msm_t7", train="methods/msm_loss_train4.py", ev="methods/msm_final_eval2.py", config="configs/qwen3_4b_msm_loss.yaml", tag="msq_{l}_T{T}_s{s}", po_prefix="msqpo", val="methods/msm_val_eval.py", val_extra=""),
+           "llama": dict(root="msm_llama", train="methods/msm_llama_loss_train.py", ev="methods/msm_llama_eval.py", config="configs/llama31_8b_msm.yaml", tag="mlq_{l}_T{T}_s{s}", po_prefix="mlpo", val="methods/msm_val_eval_lg.py", val_extra=" --family llama"),
+           "gemma": dict(root="msm_gemma", train="methods/msm_gemma_loss_train.py", ev="methods/msm_gemma_eval.py", config="configs/gemma3_4b_msm.yaml", tag="gmq_{l}_T{T}_s{s}", po_prefix=None, val="methods/msm_val_eval_lg.py", val_extra=" --family gemma")}[m]
     root = f"{C}/{cfg['root']}"
     L = {"ce": "B", "soft": "E", "any": "M"}
+    po_T = [T for T in instr if T in MS_PO_T[m]]
+    po_root = f"{C}/msm_po"
+    po_custom = f"{FREEZE}/custom_instructions_po_{m}.json"
     out = []
 
     def tag(path, T, s):
@@ -100,8 +110,20 @@ def msm(m, paths, instr, seeds, stage, gpu):
             d = "msm_loss" if path == "ce" else "msm_loss2"
             return f"{C}/{d}/checkpoints/{tag(path, T, s)}/ckpt_final.pt"
         return f"{root}/train/checkpoints/{tag(path, T, s)}/ckpt_final.pt"
+
+    def po_tag(path, T, s):
+        return f"{cfg['po_prefix']}_{L[path]}_T{T}_s{s}"
+
+    def po_ckpt(path, T, s):
+        return f"{po_root}/train/checkpoints/{po_tag(path, T, s)}/ckpt_final.pt"
+    po_paths = [p for p in ("ce", "soft") if "po-" + p in paths]
     if stage in ("prep", "all") and m == "qwen":
         out.append("python scripts/restore_data.py msmarco-cache      # passage cache of the Qwen3-4B trainers (needs the pinned Qwen3-4B tokenizer)")
+    if stage in ("prep", "all") and po_T:
+        out.append("# OPTIONAL regeneration of the APO-CF selection stage (one round: shorter / similar / bare candidates + the original; selection by kappa on val200 with the Base model at t = 0; the diagnostic set diag200 supplies the confusion matrix).")
+        out.append("# The proposer samples at temperature 1.0, so a new run gives other candidate texts; the frozen selections in cpmr_experiment/msm_po/{qwen,llama}/p1_T*/ and cpmr_experiment/msm_po/freeze/ are the reference of the paper.")
+        for T in instr:
+            out.append(f"# {g} methods/msm_apocf_p1.py --model {m} --orig_id T{T} --out_dir {po_root}/{m}_regen/p1_T{T} --local_files_only")
     if stage in ("train", "all"):
         for T in instr:
             for s in seeds:
@@ -117,6 +139,12 @@ def msm(m, paths, instr, seeds, stage, gpu):
                         out.append(f"{g} {cfg['train']} --loss {L[path]} --instr T{T} --seed {s} --tag {tag(path, T, s)} --config {cfg['config']} --out_root {root}/train{custom} --local_files_only")
                     else:
                         out.append(f"{g} {cfg['train']} --loss {L[path]} --instr T{T} --seed {s} --tag {tag(path, T, s)} --out_root {root}/train{custom} --grad_ckpt 0 --local_files_only")
+        for T in po_T:                                              # PO -> SFT: the selected (changed) instruction is used for training and evaluation
+            for s in seeds:
+                for path in po_paths:
+                    cf = f"--config {cfg['config']} " if m == "qwen" else ""
+                    extra = "" if m == "qwen" else " --grad_ckpt 0"
+                    out.append(f"{g} {cfg['train']} --loss {L[path]} --instr T{T}_APOCF --seed {s} --tag {po_tag(path, T, s)} {cf}--out_root {po_root}/train --custom_instruction_file {po_custom}{extra} --local_files_only")
     if stage in ("eval", "all"):
         if "base" in paths:
             out.append(f"{g} {cfg['ev']} --models " + " ".join(f"Base:T{T}:BASE" for T in instr) + f" --out_dir {root}/eval --custom_instruction_file {CUSTOM} --local_files_only")
@@ -124,6 +152,25 @@ def msm(m, paths, instr, seeds, stage, gpu):
             models = [f"{tag(p, T, s)}:T{T}:{ckpt(p, T, s)}" for p in ("ce", "soft", "any") if p in paths for s in seeds]
             if models:
                 out.append(f"{g} {cfg['ev']} --models {' '.join(models)} --out_dir {root}/eval --custom_instruction_file {CUSTOM} --local_files_only")
+        if "po-base" in paths and po_T:
+            out.append(f"{g} {cfg['ev']} --models " + " ".join(f"BaseAPO_T{T}:T{T}_APOCF:BASE" for T in po_T) + f" --out_dir {po_root}/eval --custom_instruction_file {po_custom} --local_files_only")
+        for T in po_T:
+            models = [f"{po_tag(p, T, s)}:T{T}_APOCF:{po_ckpt(p, T, s)}" for p in po_paths for s in seeds]
+            if models:
+                out.append(f"{g} {cfg['ev']} --models {' '.join(models)} --out_dir {po_root}/eval --custom_instruction_file {po_custom} --local_files_only")
+    if stage in ("val", "all"):
+        # scores of every model on the 400 validation pairs (val200); the threshold of each checkpoint is the kappa maximizer on these scores (analysis/po_val_analysis.py) and is applied unchanged to TREC-DL 2019 and 2020
+        vcust = f"{CUSTOM}" + (f" {po_custom}" if po_T else "")
+        vo = f"--out_dir {C}/msm_val/eval --custom_instruction_file {vcust} --local_files_only"
+        vbase = ([f"Base:T{T}:BASE" for T in instr] if "base" in paths else []) + ([f"BaseAPO_T{T}:T{T}_APOCF:BASE" for T in po_T] if "po-base" in paths else [])
+        if vbase:
+            out.append(f"{g} {cfg['val']}{cfg['val_extra']} --models {' '.join(vbase)} {vo}")
+        for T in instr:
+            models = [f"{tag(p, T, s)}:T{T}:{ckpt(p, T, s)}" for p in ("ce", "soft", "any") if p in paths for s in seeds]
+            if T in po_T:
+                models += [f"{po_tag(p, T, s)}:T{T}_APOCF:{po_ckpt(p, T, s)}" for p in po_paths for s in seeds]
+            if models:
+                out.append(f"{g} {cfg['val']}{cfg['val_extra']} --models {' '.join(models)} {vo}")
     return out
 
 
@@ -171,7 +218,7 @@ if __name__ == "__main__":
     ap.add_argument("--paths", default="base,ce,soft,any,po-base,po-ce,po-soft")
     ap.add_argument("--instr", default="1-7")
     ap.add_argument("--seeds", default="0,1,2")
-    ap.add_argument("--stage", default="all", choices=["prep", "train", "eval", "all"])
+    ap.add_argument("--stage", default="all", choices=["prep", "train", "eval", "val", "all"])
     ap.add_argument("--gpu", default="0", help="physical GPU index to expose (CUDA_VISIBLE_DEVICES)")
     ap.add_argument("--all", action="store_true")
     ap.add_argument("--out", default=None)

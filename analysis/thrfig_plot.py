@@ -1,4 +1,4 @@
-"""Chapter 6.3 threshold-gain panels (experiment log 243): nine independent point/interval panels, per-draw delta kappa_b = kappa_test(t_b) - kappa_test(t=0) of Base / CE / CE+soft kappa / CE+AnyLoss-like kappa (T1-T7, 3-seed mean, 500 validation-query resamples), from shared/242 err63_draws.json only (ESCI: reuse_rng1 draws, MS MARCO: new_rng63); no recomputation of thresholds.
+"""Chapter 6.3 threshold-gain panels: nine independent point/interval panels, per-draw delta kappa_b = kappa_test(t_b) - kappa_test(t=0) of Base / CE / CE+soft kappa / CE+AnyLoss-like kappa (T1-T7, 3-seed mean, 500 validation-query resamples), from shared/242 err63_draws.json only (ESCI: reuse_rng1 draws, MS MARCO: new_rng63); no recomputation of thresholds.
    python thrfig_plot.py --draws <err63_draws.json> --res <err63_results.json> --out <dir>"""
 import argparse, hashlib, json, math
 from pathlib import Path

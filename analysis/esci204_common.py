@@ -1,4 +1,4 @@
-"""Shared loaders / metrics of the ESCI systematic comparison (experiment log 204; Qwen3-4B stages 1-2).
+"""Shared loaders / metrics of the ESCI systematic comparison (Qwen3-4B stages 1-2).
 Score layout: <root>/cpmr_experiment/**/esciEval_<model>_step625__<instr>__<tag>.json.gz  (tag test300 | sel), Base: esciEval_Base__<instr>__test300.json.gz,
 Base validation: <root>/cpmr_experiment/esci_t/p1_T<k>/p1_raw_cand<i>.json.gz (+ p1_result.json: chosen candidate).
 Margin m = logP(label + terminator)(Relevant) - logP(label + terminator)(Irrelevant); Relevant if m > t; ESCI E = Relevant, S / C / I = Irrelevant.

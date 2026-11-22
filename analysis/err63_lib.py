@@ -1,4 +1,4 @@
-"""Library of the chapter 6.3 threshold-stability analysis (experiment log 241): validation-query bootstrap thresholds applied to the FIXED test / CROSS set, from the EXISTING stored scores (no new inference).
+"""Library of the chapter 6.3 threshold-stability analysis: validation-query bootstrap thresholds applied to the FIXED test / CROSS set, from the EXISTING stored scores (no new inference).
 Loading goes through err62_lib / auc61_data (the loaders of the original analyses). Weighted threshold re-selection = the algorithm of esci204_stability.best_weighted (resampled rows with positive multiplicity, candidates: 0, midpoints of consecutive distinct scores of the resampled rows, below-all, above-all; hard kappa maximum of the weighted counts; ties -> 0, then smaller |t|, then smaller t; decision m > t)."""
 import json
 import sys

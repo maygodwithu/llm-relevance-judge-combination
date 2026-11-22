@@ -1,4 +1,4 @@
-"""Shared pieces of the ESCI extension (experiment log 156; Qwen3-4B, second server): prompt builder, label+<|im_end|> scorer (same path as qwen8_r7_eval.score_batch / antique_eval: BF16 blocks, FP32 final norm / head / log_softmax at the supervised
+"""Shared pieces of the ESCI extension (Qwen3-4B, second server): prompt builder, label+<|im_end|> scorer (same path as qwen8_r7_eval.score_batch / antique_eval: BF16 blocks, FP32 final norm / head / log_softmax at the supervised
 positions, template with enable_thinking=False, right padding) and the CE row forward used by the trainer. The product block is the cached text of methods/esci_audit.py (does not depend on the instruction); it already carries its 'Product:' marker.
 Prompt: '<instruction>\\n\\nQuery: <query>\\n<product block>' as the user turn of the official chat template; answer 'Relevant' / 'Irrelevant' + <|im_end|>."""
 import torch

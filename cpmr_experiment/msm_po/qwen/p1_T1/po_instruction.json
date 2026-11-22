@@ -1,0 +1,1 @@
+{"T1_APOCF": "Judge whether the passage directly addresses the query's information need. A passage is relevant only if it provides direct, complete information to answer the query.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

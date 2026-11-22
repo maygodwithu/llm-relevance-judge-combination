@@ -1,4 +1,4 @@
-"""Main analysis of experiment log 204, stages 1-2 (Qwen3-4B; ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction).
+"""Main analysis, stages 1-2 (Qwen3-4B; ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction).
 Paths: Q0 Base original text, Q1 original CE, Q2 original CE + soft kappa (lambda 1), Q3 original CE + AnyLoss-like kappa (lambda 1, alpha 10), P0 Base with the frozen APO-CF text, P1 APO-CF -> CE, P2 APO-CF -> CE + soft kappa (T1-T3 only).
 Each path at t = 0 and with its own validation threshold (selection 200 queries / 4,047 rows, hard-kappa maximum; the Base threshold is never transferred). Test = frozen test300 (300 queries / 6,078 rows).
 Order of aggregation: per-instruction kappa -> equal-weight mean over the instruction set -> mean over seeds (never a pooled confusion matrix).
@@ -60,7 +60,7 @@ def main():
     TSETS = {"T2-T7 (main)": list(range(2, 8)), "T1-T7": list(range(1, 8)), "T1-T3": [1, 2, 3]}
     lines = []
     P = lines.append
-    P("ESCI systematic comparison (experiment log 204), stages 1-2; Qwen3-4B; test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
+    P("ESCI systematic comparison, stages 1-2; Qwen3-4B; test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
     P("completeness (models available with both test300 and validation scores):")
     for c in C.CONDS_ALL:
         P(f"  {c}: " + " ".join(f"T{T}:{sum((c, T, s) in D for s in seeds_of(c))}/{len(seeds_of(c))}" for T in C.TS))

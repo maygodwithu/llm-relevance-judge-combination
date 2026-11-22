@@ -1,8 +1,8 @@
-"""Codex 245 copy of esci_loss_train_mix_fo.py: adds --alpha (AnyLoss-like kappa sharpness, default 10.0 = the 185 value, passed explicitly through the loss / gradient / diagnostics) and --loss mixbce (L = token CE + lam * mean_i BCEWithLogits(m_i, y_i), per-micro-batch backward of sum / 16, one independent forward for the BCE margins; no two-pass scheme is needed because the BCE batch mean is a sum of per-row terms). Everything else is unchanged.
-Original docstring: ESCI CE + kappa trainer (experiment log 181, 182 and 185; this copy of esci_loss_train_mix.py adds only --final_only; --loss mix = E: CE + soft kappa, --loss mixany = F: CE + AnyLoss-like kappa alpha 10; the trainer esci_loss_train.py of 169-172 plus --loss mix, nothing else changed): L = L_tokenCE + lam * L_softkappa, lam = 1.0 fixed beforehand. L_tokenCE = the loss of condition A (esci_core.ce_rows, token mean of the gold label + <|im_end|>, mean over the 16 rows), L_softkappa = U / clamp_min(V, 1e-6) over the 16 rows of the update
+"""the experiment copy of esci_loss_train_mix_fo.py: adds --alpha (AnyLoss-like kappa sharpness, default 10.0 = the 185 value, passed explicitly through the loss / gradient / diagnostics) and --loss mixbce (L = token CE + lam * mean_i BCEWithLogits(m_i, y_i), per-micro-batch backward of sum / 16, one independent forward for the BCE margins; no two-pass scheme is needed because the BCE batch mean is a sum of per-row terms). Everything else is unchanged.
+Original docstring: ESCI CE + kappa trainer (this copy of esci_loss_train_mix.py adds only --final_only; --loss mix = E: CE + soft kappa, --loss mixany = F: CE + AnyLoss-like kappa alpha 10; the trainer esci_loss_train.py of 169-172 plus --loss mix, nothing else changed): L = L_tokenCE + lam * L_softkappa, lam = 1.0 fixed beforehand. L_tokenCE = the loss of condition A (esci_core.ce_rows, token mean of the gold label + <|im_end|>, mean over the 16 rows), L_softkappa = U / clamp_min(V, 1e-6) over the 16 rows of the update
 (p = sigmoid(m), m = log P(Relevant + terminator) - log P(Irrelevant + terminator), FP32 head, denominator gradient kept) by the exact two-pass scheme. The CE part is computed first (independent forwards, backward per micro-batch); the kappa part follows (pass 1 without grad -> g = dL_K/dm -> pass 2 per micro-batch with the dropout RNG restored; afterwards the RNG is set to its state after pass 1).
 An update with r = 0 or 1 (none in the frozen orders of the seeds 0, 1 and 2, audited) would get a zero kappa gradient while the CE term trains normally. Below: the original docstring of the four-loss trainer.
-Four-loss pilot trainer (experiment log 169; Qwen3-4B Base, ESCI-T1, seed 0; same recipe as esci_train.py of 165): --loss ce | bce | softk | anyk.
+Four-loss pilot trainer (Qwen3-4B Base, ESCI-T1, seed 0; same recipe as esci_train.py of 165): --loss ce | bce | softk | anyk.
 ce   : esci_core.ce_rows (identical to esci_train.py: token mean of the correct label + <|im_end|>, mean over the rows).
 bce  : mean over the 16 rows of softplus(m) - y m, m = s_plus - s_minus (sums of log P(label + <|im_end|>), both labels teacher forced, FP32 norm / head / log_softmax).
 softk / anyk : one loss over the 16 rows (loss_from_m); exact two-pass computation (pass 1 no grad -> 16 margins -> dL/dm; pass 2 per micro-batch with grad and the restored dropout RNG state). Single-class updates (r = 0 or 1): loss / gradient 0, optimizer.step skipped
@@ -49,7 +49,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--loss", required=True, choices=["ce", "bce", "softk", "anyk", "mix", "mixany", "mixbce"])
     ap.add_argument("--lam", type=float, default=1.0)
-    ap.add_argument("--alpha", type=float, default=10.0, help="AnyLoss-like kappa sharpness (mixany only); 10.0 = experiment log 185")
+    ap.add_argument("--alpha", type=float, default=10.0, help="AnyLoss-like kappa sharpness (mixany only); 10.0 = the value of the paper")
     ap.add_argument("--instr", default="T1")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--instr_file", default="cpmr_experiment/esci_t/esci_t_manifest.json")
@@ -61,7 +61,7 @@ def main():
     ap.add_argument("--tag_prefix", default="EQ")
     ap.add_argument("--check", type=int, default=0, help="N updates, nothing durable")
     ap.add_argument("--local_files_only", action="store_true")
-    ap.add_argument("--final_only", action="store_true", help="save only the step 0 adapter (hash audit) and the final adapter (no intermediate checkpoints; experiment log 185)")
+    ap.add_argument("--final_only", action="store_true", help="save only the step 0 adapter (hash audit) and the final adapter (no intermediate checkpoints)")
     ap.add_argument("--dump_grad", default="", help="test only (with --check 1): save the flattened gradient of the first update and stop before the optimizer step")
     ap.add_argument("--test_b_std", type=float, default=0.0, help="test only: non-zero LoRA B (normal, this std) so that every parameter receives a gradient")
     ap.add_argument("--lora_dropout", type=float, default=None, help="test only: override the config dropout")

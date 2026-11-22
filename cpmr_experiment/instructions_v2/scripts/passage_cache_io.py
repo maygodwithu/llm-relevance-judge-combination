@@ -10,7 +10,7 @@ No silent fallback. A missing or stale key raises; it never falls back to the or
 passage or to a differently-truncated one, because that would reintroduce exactly the
 per-prompt variation the cache exists to remove.
 
-Two profiles (message 019 section 2.3):
+Two profiles :
   * diagnostic -- may run with an unidentified tokenizer; results are provisional.
   * production -- requires a locked manifest AND a fingerprinted tokenizer. A locked
     manifest alone is not sufficient.

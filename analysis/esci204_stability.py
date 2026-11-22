@@ -1,4 +1,4 @@
-"""Threshold stability under validation-sample variation (experiment log 204, stored-score item 3; Qwen3-4B stages 1-2; paths Q1 / Q2 / Q3 (and P1 / P2 where available), instructions T1-T7).
+"""Threshold stability under validation-sample variation (stored-score item 3; Qwen3-4B stages 1-2; paths Q1 / Q2 / Q3 (and P1 / P2 where available), instructions T1-T7).
 For every model the 200 validation (selection) queries are resampled with replacement (500 resamples, np.random.default_rng(1), ONE validation resample set for every path / instruction / seed), the threshold is re-selected with the same rule
 (hard-kappa maximum of the weighted resample; candidates 0, midpoints of consecutive distinct scores of the resampled rows, below-all, above-all; ties -> 0, then smaller |t|, then smaller t) and applied to the FIXED test300 scores.
 Reported: distribution of the test kappa over the resamples, its change relative to t=0 and to the full-validation threshold, the share of test decisions that change, the re-selected thresholds in units of the model's own validation margin SD
@@ -93,7 +93,7 @@ def main():
 
     L = []
     P = L.append
-    P(f"Threshold stability under validation-sample variation (experiment log 204): {R} validation-query resamples of the {len(vq)} selection queries, fixed test300; thresholds re-selected with the same rule")
+    P(f"Threshold stability under validation-sample variation: {R} validation-query resamples of the {len(vq)} selection queries, fixed test300; thresholds re-selected with the same rule")
     for name, Ts in SETS.items():
         P(f"\n## {name} (equal-weight mean of per-instruction test kappa, then mean over seeds)")
         P("| path | kappa t=0 | kappa full-val thr | resampled-thr kappa: mean | SD | 2.5% | 97.5% | mean - t0 | share of resamples with kappa > t0 | decisions changed vs full-val thr | vs t=0 |")

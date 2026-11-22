@@ -1,4 +1,4 @@
-"""Loss library of the ESCI four-loss pilot (experiment log 169; Qwen3-4B, ESCI-T1, seed 0). Pure torch; no tokenizer needed for the tested parts.
+"""Loss library of the ESCI four-loss pilot (Qwen3-4B, ESCI-T1, seed 0). Pure torch; no tokenizer needed for the tested parts.
 A  token CE     : esci_core.ce_rows (unchanged, the 165 implementation)
 B  label BCE    : mean over rows of softplus(m) - y m, m = s_plus - s_minus, s_label = sum of log P(label tokens + terminator) (teacher forced, FP32 head / log_softmax of the evaluation path)
 C  soft kappa   : q = p = sigmoid(m);  D  AnyLoss-like kappa: q = sigmoid(alpha (p - 0.5)), alpha = 10 (fixed beforehand)

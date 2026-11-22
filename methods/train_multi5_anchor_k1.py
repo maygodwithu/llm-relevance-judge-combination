@@ -1,4 +1,4 @@
-"""Multi-5 with a T1 anchor, K=1 (experiment log 109): alternate, in training order, a query group under T1 and a query group under one of
+"""Multi-5 with a T1 anchor, K=1: alternate, in training order, a query group under T1 and a query group under one of
 T2..T5 drawn at random. One instruction per query group (both documents under it), one gold-label CE forward per document, token CE only,
 5,000 queries, 625 optimizer steps, 10,000 forwards.
 

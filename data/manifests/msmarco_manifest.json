@@ -24,5 +24,23 @@
   "enable_thinking": "false",
   "corpus_version": "ir_datasets:msmarco-passage@ir_datasets-0.6.3,docs_count=8841823",
   "selection_seed": 0
+ },
+ "val200": {
+  "pairs_file_sha256": "6f2aae0d163d7908a89c58bf614d3e879affa1e75b36535542cec750ee5cf67a",
+  "rows": 400,
+  "queries": 200,
+  "relevant": 200,
+  "manifest": "data/manifests/msmarco_val200_pairs.csv",
+  "restored_file": "data/msmarco_po/val200/pairs_text_basic_seed0.jsonl",
+  "rule": "200 queries of the MS MARCO passage training split, disjoint from the 5,000 SFT queries and from the diagnostic set. They were drawn from the 400 queries added when the 5,200-query selection (random.Random(0) over the training queries that have a known positive) was extended to 5,600: 241 of them have a known positive in the BM25 top-100, and 200 of these were sampled with random.Random('t1-mipro-val-v1'). The pairs follow the same one-positive / one-unlabelled rule as the training pairs: positive = the known positive with the smallest passage id (string order); negative = one passage drawn uniformly (seed 0) from the BM25 top-1,000 of the query after removing all known positives, labelled Irrelevant (unlabelled passage; never redrawn). BM25 = the repository's own implementation (k1 1.2, b 0.75). No TREC-DL query is used; the set is used for instruction selection (PO) and for threshold selection."
+ },
+ "diag200": {
+  "pairs_file_sha256": "6c3b0cdd3dbe6e86f6e88f516f27e912a15108e93a0aa8670e36f101354194bf",
+  "rows": 400,
+  "queries": 200,
+  "relevant": 200,
+  "manifest": "data/manifests/msmarco_diag200_pairs.csv",
+  "restored_file": "data/msmarco_po/diag200/pairs_text_basic_diag200.jsonl",
+  "rule": "200 queries of the 5,200-query selection that are not used for SFT (the tail of the string-sorted selection); the same sampling rule and pair builder as the training pairs, rows identical to the corresponding rows of the 5,200-query pair file; used only as the confusion-matrix feedback set of PO."
  }
 }

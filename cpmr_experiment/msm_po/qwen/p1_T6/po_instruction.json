@@ -1,0 +1,1 @@
+{"T6_APOCF": "Determine whether the passage directly addresses the query's key information. A passage is relevant if it provides the essential details needed to answer the query. Partially relevant or tangentially related content is not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

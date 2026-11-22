@@ -6,6 +6,7 @@
 import argparse
 import csv
 import hashlib
+import unicodedata
 import json
 import sys
 from pathlib import Path
@@ -57,6 +58,23 @@ if not a.skip_msmarco:
     check("msmarco train: rows / queries", len(rows) == mm["train_rows"] and len(qs) == mm["train_queries"], f"{len(rows)} / {len(qs)}")
     check("msmarco train: one Relevant and one Irrelevant per query", all(sorted(v) == ["Irrelevant", "Relevant"] for v in qs.values()))
     check("msmarco train: file sha256", hashlib.sha256(f.read_bytes()).hexdigest() == mm["train_pairs_file_sha256"])
+    # validation (val200) and PO diagnostic (diag200) sets: counts, labels, file hash, and query disjointness from the training queries, from each other and from TREC-DL
+    norm = lambda t: " ".join(unicodedata.normalize("NFKC", t).lower().split())
+    sets = {"train": ({r["query_id"] for r in rows}, {norm(r["query"]) for r in rows})}
+    for name in ("val200", "diag200"):
+        meta = mm[name]; fo = ROOT / meta["restored_file"]
+        pr = [json.loads(l) for l in open(fo, encoding="utf-8")]
+        q2 = {}
+        for r in pr:
+            q2.setdefault(r["query_id"], []).append(r["label"])
+        check(f"msmarco {name}: rows / queries / Relevant", len(pr) == meta["rows"] and len(q2) == meta["queries"] and sum(r["label"] == "Relevant" for r in pr) == meta["relevant"], f"{len(pr)} / {len(q2)}")
+        check(f"msmarco {name}: one Relevant and one Irrelevant per query", all(sorted(v) == ["Irrelevant", "Relevant"] for v in q2.values()))
+        check(f"msmarco {name}: file sha256", hashlib.sha256(fo.read_bytes()).hexdigest() == meta["pairs_file_sha256"])
+        sets[name] = ({r["query_id"] for r in pr}, {norm(r["query"]) for r in pr})
+    names = list(sets)
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            check(f"msmarco query-id and normalized-text overlap {names[i]} / {names[j]} = 0", not (sets[names[i]][0] & sets[names[j]][0]) and not (sets[names[i]][1] & sets[names[j]][1]))
     for y, meta in mm["years"].items():
         pool = ROOT / a.pool_dir / f"msmarco_trec{y}_bm25top100_pool.jsonl"
         pr = [json.loads(l) for l in open(pool, encoding="utf-8")]

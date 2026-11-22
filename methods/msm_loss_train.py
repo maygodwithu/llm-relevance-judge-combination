@@ -1,4 +1,4 @@
-"""MS MARCO four-loss pilot trainer (experiment log 176; Qwen3-4B, MS MARCO T1, seeds 0/1/2; second server). Same data, order, model, LoRA, optimizer, scheduler, input builder (V2 path, max_length 384) and gradient-checkpointing config as the original
+"""MS MARCO four-loss pilot trainer (Qwen3-4B, MS MARCO T1, seeds 0/1/2; second server). Same data, order, model, LoRA, optimizer, scheduler, input builder (V2 path, max_length 384) and gradient-checkpointing config as the original
 K=1 trainer methods/train_rank_margin_k1.py (schedule single, T1 for every query group): 5,000 frozen query groups (one positive, one negative passage), 10,000 sequences, 8 groups = 16 sequences per update, 625 updates, warm-up round(.1 * 625) = 62, AdamW lr 2e-5, no clipping.
 --loss A : the original loss, unchanged: 0.5 (CE_pos + CE_neg) + 1.0 * softplus(-(m_pos - m_neg)), m = first-token logit margin; forwards: the gold label of each document only (HF loss, bf16 logits).
 --loss B : 0.5 (CE_pos + CE_neg) per group (ranking term removed, same token CE reduction).

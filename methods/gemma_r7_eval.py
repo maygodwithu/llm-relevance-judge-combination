@@ -1,4 +1,4 @@
-"""Gemma-3-4B-IT evaluation of the modified R7 relevance instructions (experiment log 135): TREC-DL 2019 / 2020, every original candidate pair (judged and unjudged), label + end-of-turn scoring in FP32.
+"""Gemma-3-4B-IT evaluation of the modified R7 relevance instructions: TREC-DL 2019 / 2020, every original candidate pair (judged and unjudged), label + end-of-turn scoring in FP32.
 Model: google/gemma-3-4b-it (local snapshot, revision recorded), Gemma3ForConditionalGeneration, text path only; bf16 transformer blocks, the final RMSNorm (applied to float32 input -> float32 output), the tied unembedding and log_softmax are evaluated in float32 at the supervised positions only
 (same computation scheme as loss_score_fp32.score_both_ext of the Qwen experiments; the vocabulary is 262,208, no final logit soft-capping in this model).
 Prompt: official chat template of the tokenizer (<bos><start_of_turn>user\n{instruction}\n\nQuery: {query}\nPassage: {passage}<end_of_turn>\n<start_of_turn>model\n), tokenised with add_special_tokens=False, followed by the answer tokens of the label and the turn terminator.

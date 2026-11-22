@@ -170,7 +170,7 @@ def score_candidates(model, tokenizer, instruction, query_text, cand_ids, doc_te
     rewriter.predict_label과 동일한 pointwise scoring 원리를 배치 처리로 확장한 것
     (query 1000개 x pid 최대 100개를 순차 처리하면 너무 느려 배치가 필수).
     example_builder: build_example과 동일한 시그니처의 대체 함수(기본값 build_example) --
-    sftreg의 no-instruction semantic-responsiveness 조건처럼 프롬프트 구성 자체를
+    this project의 no-instruction semantic-responsiveness 조건처럼 프롬프트 구성 자체를
     바꿔야 할 때 사용."""
     example_builder = example_builder or build_example
     was_training = model.training

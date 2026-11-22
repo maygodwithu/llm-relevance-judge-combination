@@ -2,25 +2,35 @@
 
 Jaekeol Choi, Hankuk University of Foreign Studies.
 
-Code, frozen instructions and ID manifests that reproduce the experiments of the paper.
+Code, frozen instructions and ID manifests that reproduce the experiments of the paper. This version follows the protocol of the revised manuscript; see **Protocol** below and [`docs/MIGRATION.md`](docs/MIGRATION.md) for what differs from the first public version.
 This repository contains **no model weights, no adapters, no copy of the public datasets and no per-example score files of the fine-tuned models**. Everything that can be downloaded is restored from the public sources by ID manifests; everything that can be recomputed is recomputed.
 
 The study compares prompt optimization (APO-CF, "PO"), supervised fine-tuning (SFT) objectives and decision thresholds for an LLM relevance judge on ESCI (product search) and MS MARCO / TREC-DL 2019 and 2020 (passage ranking), with Qwen3-4B, Llama-3.1-8B-Instruct and Gemma-3-4B-it:
 conditions **Base**, **CE**, **CE+soft κ** ("S"), **CE+AnyLoss-style κ** ("A"); original instructions **T1–T7** of each dataset, training seeds 0/1/2, final (625-update) checkpoint; default threshold t = 0 and a threshold selected on a separate validation set.
 
+## Protocol (main experiments)
+
+* **Models**: Qwen3-4B, Llama-3.1-8B-Instruct, Gemma-3-4B-it. **Instructions**: seven per dataset (T1–T7). **Conditions**: Base, CE, CE+soft κ, CE+AnyLoss-style κ; **PO** (APO-CF) → SFT with CE and CE+soft κ. Seeds 0/1/2, final (625-update) checkpoint.
+* **PO scope**: Qwen3-4B and Llama-3.1-8B-Instruct on **ESCI and MS MARCO, T1–T7** (not Gemma, and no PO after SFT). The Base model evaluates the original and up to three generated candidates at t = 0 on the selection set and the highest-κ candidate is kept (ties: the original); it is then fixed for all SFT objectives. Which instructions were changed or kept is listed in [`docs/PO_SELECTION.md`](docs/PO_SELECTION.md).
+* **Thresholds** (default t = 0 and a validation-selected t*): the threshold of each model, instruction and seed is the κ maximizer on a **separate validation set** of the same data source, fixed before the test sets are scored. **ESCI**: the validation split `sel` (the same split that selects the PO instruction). **MS MARCO**: the **train-derived validation set `val200`** (200 queries, 400 pairs; same one-positive / one-unlabelled sampling as the training pairs; no TREC-DL data); **the same threshold is applied unchanged to TREC-DL 2019 and to TREC-DL 2020**.
+* **Cross-year thresholds are a supplementary analysis, not the main protocol**: Appendix C of the paper also reports thresholds selected on all judged pairs of one TREC-DL year and applied to the other year. The scripts `analysis/msm_{t7,llama,gemma}_analysis.py` implement that cross-year setting (their output columns are named CROSS); the main MS MARCO protocol is `analysis/po_val_analysis.py` (see section 5).
+
 ## 1. Layout
 
 | path | content |
 |---|---|
-| `methods/` | trainers, evaluators, data-preparation and PO scripts (the code that produced the results; see `CHANGES_FROM_ORIGINAL.md`) |
-| `src/`, `evaluation/`, `cpmr_experiment/scripts/`, `cpmr_experiment/instructions_v2/scripts/` | model loading, prompt builders, scoring helpers (imported by `methods/`; the directory name `cpmr_experiment/` is the working-directory name of the original scripts and is kept so that no path has to be edited) |
+| `methods/` | trainers, evaluators, data-preparation and PO scripts (the code that produced the results; see `CHANGES_FROM_ORIGINAL.md`). MS MARCO validation scoring: `msm_val_eval.py` (Qwen), `msm_val_eval_lg.py` (Llama, Gemma); MS MARCO PO: `msm_apocf_p1.py`, `freeze_po.py` |
+| `src/`, `evaluation/`, `cpmr_experiment/scripts/`, `cpmr_experiment/instructions_v2/scripts/` | model loading, prompt builders, scoring helpers (imported by `methods/`; the directory name `cpmr_experiment/` is the working-directory name of the original scripts and is kept so that no path has to be edited); the MS MARCO sampling builders (`build_msmarco_train_candidates.py`, `build_basic_hard_pairs.py`, `join_msmarco_pair_text.py`) document how the training, diagnostic and validation pairs were drawn |
 | `configs/` | one YAML per model and dataset (LoRA, optimizer, input limit) |
-| `data/manifests/` | ID manifests: the exact ESCI rows (`esci_rows_*.csv`), the MS MARCO training pairs, the judged TREC-DL pairs, checksums (`esci_manifest.json`, `msmarco_manifest.json`) |
-| `cpmr_experiment/esci_t/`, `cpmr_experiment/esci_llama/`, `methods/custom_instructions_T6_T7.json`, `cpmr_experiment/instructions_v2/manifest/` | frozen instructions T1–T7 (ESCI and MS MARCO), the APO-CF selection results (T1–T3) and the Base selection scores that the Base thresholds need |
+| `data/manifests/` | ID manifests: the exact ESCI rows (`esci_rows_*.csv`), the MS MARCO training pairs, the **validation (`msmarco_val200_pairs.csv`) and PO-diagnostic (`msmarco_diag200_pairs.csv`) pairs**, the judged TREC-DL pairs, checksums (`esci_manifest.json`, `msmarco_manifest.json`) |
+| `cpmr_experiment/esci_t/`, `cpmr_experiment/esci_llama/`, `methods/custom_instructions_T6_T7.json`, `cpmr_experiment/instructions_v2/manifest/` | frozen original instructions T1–T7 (ESCI and MS MARCO) and the APO-CF selection results of ESCI (T1–T7, Qwen and Llama) |
+| `cpmr_experiment/msm_po/` | the APO-CF selection results of MS MARCO (T1–T7, Qwen and Llama) and the frozen PO instruction files (`freeze/`) |
 | `cpmr_experiment/gemma231/sample_manifest.json` | checkpoint list and fixed query sample of the Gemma FP32 appendix |
-| `scripts/` | `restore_data.py` (rebuild inputs), `verify_data.py` (check them), `make_ckpt_map.py`, `make_manifests.py` (author-side tool that wrote the manifests) |
-| `experiments/make_commands.py` | prints every training / evaluation command of the paper (one condition, or `--all` for the full study) |
+| `scripts/` | `restore_data.py` (rebuild inputs), `verify_data.py` (check them), `make_ckpt_map.py`, `make_manifests*.py` (author-side tools that wrote the manifests) |
+| `experiments/make_commands.py` | prints every training / evaluation / validation-scoring command of the paper (one condition, or `--all` for the full study) |
 | `analysis/` | evaluation → threshold → tables → statistics → figure panels |
+| `analysis/supplementary/` | scripts of the supplementary analyses (section 7), kept apart from the main protocol |
+| `docs/` | `PO_SELECTION.md` (PO result per model, dataset and instruction), `ADDITIONAL_ANALYSES.md` (supplementary analyses and their code), `MIGRATION.md` (differences from the first public version) |
 | `checks/run_checks.py` | CPU-only smoke checks (no GPU, no model download) |
 
 ## 2. Setup
@@ -35,14 +45,14 @@ conditions **Base**, **CE**, **CE+soft κ** ("S"), **CE+AnyLoss-style κ** ("A")
 ```bash
 # ESCI: download https://github.com/amazon-science/esci-data (shopping_queries_dataset_{examples,products}.parquet), then
 python scripts/restore_data.py esci --esci-dir <esci-data>/shopping_queries_dataset --tokenizer Qwen/Qwen3-4B
-# MS MARCO training pairs and TREC-DL 2019/2020 judged pairs (downloaded by the ir_datasets package)
+# MS MARCO training pairs, validation set val200, PO diagnostic set diag200 and TREC-DL 2019/2020 judged pairs (downloaded by the ir_datasets package)
 python scripts/restore_data.py msmarco
 # only for the Qwen3-4B MS MARCO trainers: rebuild the passage cache (needs the pinned Qwen3-4B tokenizer)
 python scripts/restore_data.py msmarco-cache
 python scripts/verify_data.py
 ```
 
-`restore_data.py` does **no sampling**: it reads the row lists from `data/manifests/` and rebuilds the files the trainers read (`cpmr_experiment/esci/audit/{sft2,diag,sel,test300}_rows.jsonl`, `data/msmarco_train_v2_5k/pairs_text_basic_5000.jsonl`, `data/scenarios/msmarco_trec{2019,2020}_bm25top100_pool.jsonl`) and compares every file with the recorded SHA-256 (ESCI row files and the MS MARCO pair file are byte-identical to the originals; the TREC-DL pool files contain the judged pairs only, which are the only pairs that enter an evaluation; their texts are checked pair by pair).
+`restore_data.py` does **no sampling**: it reads the row lists from `data/manifests/` and rebuilds the files the trainers read (`cpmr_experiment/esci/audit/{sft2,diag,sel,test300}_rows.jsonl`, `data/msmarco_train_v2_5k/pairs_text_basic_5000.jsonl`, `data/msmarco_po/val200/pairs_text_basic_seed0.jsonl`, `data/msmarco_po/diag200/pairs_text_basic_diag200.jsonl`, `data/scenarios/msmarco_trec{2019,2020}_bm25top100_pool.jsonl`) and compares every file with the recorded SHA-256 (ESCI row files and the MS MARCO pair files (training, val200, diag200) are byte-identical to the originals; the TREC-DL pool files contain the judged pairs only, which are the only pairs that enter an evaluation; their texts are checked pair by pair).
 
 | set | queries | pairs | role |
 |---|---:|---:|---|
@@ -51,9 +61,13 @@ python scripts/verify_data.py
 | ESCI validation (`sel`) | 200 | 4,047 | PO selection and thresholds |
 | ESCI test (`test300`) | 300 | 6,078 | evaluation |
 | MS MARCO training | 5,000 | 10,000 (1 positive, 1 negative per query) | SFT |
-| TREC-DL 2019 / 2020 (judged) | 42 / 54 | 1,102 / 1,432 | evaluation; thresholds are selected on the other year |
+| MS MARCO PO diagnostic (`diag200`) | 200 | 400 (1 positive, 1 negative per query) | PO confusion matrix |
+| MS MARCO validation (`val200`) | 200 | 400 (1 positive, 1 negative per query) | PO selection and thresholds |
+| TREC-DL 2019 / 2020 (judged) | 42 / 54 | 1,102 / 1,432 | evaluation; the threshold selected on `val200` is applied to both years |
 
 Label mapping: ESCI E → Relevant, S/C/I → Irrelevant; TREC-DL grades 2–3 → Relevant, 0–1 → Irrelevant. The splits are disjoint by NFKC-lower-cased whitespace-normalized query text (`verify_data.py` checks all pairs of splits). ESCI product text is the fixed concatenation Title / Brand / Color / Bullet points / Description, cut once to 512 Qwen tokens (description first); the cut flags are in the manifests.
+
+The 400 `val200` pairs were drawn from the 400 queries that extended the 5,200-query selection of the training split to 5,600 (disjoint from the 5,000 SFT queries and from `diag200`; 241 of them have a known positive in the BM25 top-100 and 200 were sampled with a fixed seed). Positive = the known positive with the smallest passage id; negative = one passage drawn uniformly from the BM25 top-1,000 of the query after removing all known positives, labelled Irrelevant (an *unlabelled* passage, never redrawn). The sampling procedure and the other fixed parameters are recorded in `data/manifests/msmarco_manifest.json` (`val200`, `diag200`) and implemented by the builders listed in section 1. `verify_data.py` checks that the training, `val200`, `diag200` and TREC-DL queries are pairwise disjoint (query id and normalized text).
 
 ## 4. One condition end to end (Qwen3-4B, ESCI, T1, seed 0, CE + soft κ)
 
@@ -65,39 +79,49 @@ prints, in order, the training command (`methods/esci_loss_train_245.py --loss m
 
 ## 5. All experiments of the paper
 
-`python experiments/make_commands.py --all --out experiments/commands` writes one script per model and dataset (`qwen_esci.sh`, `qwen_msmarco.sh`, `llama_*`, `gemma_*`), plus `pilot245.sh` and `gemma_fp32.sh`.
+`python experiments/make_commands.py --all --out experiments/commands` writes one script per model and dataset (`qwen_esci.sh`, `qwen_msmarco.sh`, `llama_*`, `gemma_*`), plus `pilot245.sh` and `gemma_fp32.sh`. Each script contains the training, evaluation and (MS MARCO) validation-scoring stages.
 
-| paper | experiment | commands |
+| paper | experiment | commands / code |
 |---|---|---|
 | §4, Table 1 | data and splits | `scripts/restore_data.py`, `scripts/verify_data.py` |
-| §5.1–5.2, App. A | Base / CE / S / A, T1–T7, 3 seeds, t = 0 and validation threshold | `experiments/commands/{qwen,llama,gemma}_{esci,msmarco}.sh` (paths `base,ce,soft,any`); tables: `analysis/esci204_main.py` (Qwen ESCI), `esci208_llama_main.py`, `esci217_gemma_main.py`, `msm_t7_analysis.py`, `msm_llama_analysis.py`, `msm_gemma_analysis.py` |
-| §5.3, App. A | PO (APO-CF) → CE / S on ESCI, T1–T3, Qwen3-4B and Llama-3.1-8B | `--paths po-base,po-ce,po-soft` (Llama: T1 keeps the original text, so T1 is an alias of the original runs, difference 0) |
-| §6.1, App. B | AUC and paired query bootstrap | `analysis/auc61_kappa.py`, `auc61_boot.py`, `auc61_report.py` |
-| §6.2, App. B | error transitions and CE→S panels | `analysis/err62_main.py`, `errfig_plot.py` |
-| §6.3, App. B | threshold re-selection on 500 validation resamples and panels | `analysis/err63_main.py`, `thrfig_plot.py` |
+| §5.1–5.2, App. A | Base / CE / S / A, T1–T7, 3 seeds, t = 0 and validation threshold — **ESCI** | `experiments/commands/{qwen,llama,gemma}_esci.sh`; tables `analysis/esci204_main.py` (Qwen), `esci208_llama_main.py`, `esci217_gemma_main.py` (threshold: the `sel` split) |
+| §5.1–5.2, App. A | same — **MS MARCO**: models scored on TREC-DL 2019/2020 **and on `val200`**; threshold from `val200`, applied to both years | `experiments/commands/{qwen,llama,gemma}_msmarco.sh` (stages `eval` and `val`); tables and statistics `analysis/po_val_analysis.py` (+ `po_val_md.py`) |
+| §5.3, App. A | PO → CE / S, T1–T7, Qwen3-4B and Llama-3.1-8B-Instruct, **ESCI and MS MARCO** | `--paths po-base,po-ce,po-soft` (changed instructions only; kept instructions are the original runs, see `docs/PO_SELECTION.md`); ESCI tables `analysis/esci_po_analysis.py` (+ `esci_po_md.py`); MS MARCO `analysis/po_val_analysis.py` |
+| §6.1, App. B | AUC and paired query bootstrap | `analysis/auc61_kappa.py`, `auc61_boot.py`, `auc61_report.py` (AUC is threshold-independent; the selected-threshold columns of these scripts use the ESCI validation split and, for MS MARCO, the cross-year setting, see section 7) |
+| §6.2, App. B | error counts and transitions | ESCI: `analysis/err62_main.py`, `errfig_plot.py`; MS MARCO error counts at the `val200` threshold: `po_val_checkpoint_metrics.csv` written by `analysis/po_val_analysis.py` |
+| §6.3, App. B | threshold re-selection on 500 validation resamples and panels | ESCI: `analysis/err63_main.py`; MS MARCO (resampling of the `val200` queries): `analysis/po_val_analysis.py`; panels `thrfig_plot.py` |
 | App. B | Gemma FP32 evaluation | `experiments/commands/gemma_fp32.sh`, `analysis/err62_gemma.py`, `err63_gemma.py` |
 | App. B | ESCI objective pilot: λ ∈ {0.3, 1, 3}, α ∈ {5, 10, 20}, CE+label-margin BCE | `experiments/commands/pilot245.sh`, `analysis/esci245_analysis.py` |
+| App. B, C and the supplementary analyses | training budget, BCE / MAE controls, label length, seed and joint bootstrap, sampling and coverage, cross-year thresholds, independent calibration | see section 7 and `docs/ADDITIONAL_ANALYSES.md` |
 
 ## 6. Order of an analysis
 
 1. Train and evaluate (`experiments/commands/*.sh`): each evaluation writes one gzip JSON per (checkpoint, instruction, set) with the four log-probabilities of the label and the terminator for both labels; the margin is m = [log P(Relevant) + log P(terminator)] − [log P(Irrelevant) + log P(terminator)], decision m > t.
-2. Threshold: `analysis/esci204_common.py::best_threshold` — hard-κ maximum over all validation pairs of the model's own scores; candidates are 0, the midpoints of consecutive distinct scores, and below/above all scores; ties → t = 0, then smaller |t|, then smaller t. One threshold per model, instruction and seed; Base thresholds are never transferred.
-3. Tables and statistics: the `*_main.py` / `*_analysis.py` scripts of §5, then `auc61_*`, `err62_*`, `err63_*` (they read the score files by file name from `cpmr_experiment/**`, so the original run layout is not needed). Aggregation: κ per instruction and seed → equal-weight mean over the instruction subset → mean over seeds (Base: one score).
+2. Threshold: `analysis/esci204_common.py::best_threshold` — hard-κ maximum over all validation pairs of the model's own scores; candidates are 0, the midpoints of consecutive distinct scores, and below/above all scores; ties → t = 0, then smaller |t|, then smaller t. One threshold per model, instruction and seed; Base thresholds are never transferred. **Validation set: ESCI `sel`; MS MARCO `val200` (scored by `methods/msm_val_eval*.py`), with the same threshold applied to both TREC-DL years.**
+3. Tables and statistics: the scripts of section 5. Aggregation: κ per instruction and seed → equal-weight mean over the instruction subset → mean over seeds (Base: one score).
 4. Panels: `errfig_plot.py`, `thrfig_plot.py` (one vector file per panel; the LaTeX layout is not part of this repository).
 
 ```bash
-python analysis/auc61_kappa.py --root . --mods analysis --out cpmr_experiment/auc61/out
+# MS MARCO main protocol (stored scores of the three models; val200 threshold applied to both years)
+python analysis/auc61_kappa.py --root . --mods analysis --out cpmr_experiment/auc61/out            # kappa.pkl: t = 0 and the cross-year reference values
+python analysis/po_val_analysis.py --root . --mods analysis --kappa cpmr_experiment/auc61/out/kappa.pkl --out cpmr_experiment/msm_val/summary
+python analysis/po_val_md.py cpmr_experiment/msm_val/summary/po_val_results.json cpmr_experiment/msm_val/summary/po_val_results.md
+# ESCI statistics
 python analysis/err62_main.py --root . --mods analysis --kappa cpmr_experiment/auc61/out/kappa.pkl --out cpmr_experiment/err62/out
 python analysis/err63_main.py --root . --mods analysis --kappa cpmr_experiment/auc61/out/kappa.pkl --out cpmr_experiment/err63/out
 ```
 
+`po_val_analysis.py` asserts before it writes anything that the t = 0 and cross-year values it recomputes equal those of `kappa.pkl` (difference < 1e-9). The score files are found by name under `cpmr_experiment/**`; keep only the run directories of one study in the tree (the same file name from another model or study would be read as well).
+
 ## 7. Reproduction scope and caveats
 
 * **Own-instruction evaluation.** Every SFT model is evaluated with the instruction it was trained with; Base uses the same text. Seed means average instruction-level κ with equal weights.
-* **PO subset.** APO-CF results exist for T1–T3 of ESCI with Qwen3-4B and Llama-3.1-8B-Instruct (not for Gemma, not for MS MARCO). The selected instructions are shipped (`cpmr_experiment/esci_t/p1_T*/esci_apocf_manifest.json`, `cpmr_experiment/esci_llama/p1_T*/`) together with the proposer prompts and replies (`p1_exchange.json`). The proposer samples at temperature 1.0, so **re-running the PO stage does not reproduce the same candidates**; the frozen selections are the reference and the commands that regenerate the stage are commented out in the generated scripts. The meta-prompts shipped in `src/apocf_prompt.py` were checked to rebuild all 18 recorded meta-prompts (T1–T3, three variants, both models) byte for byte.
+* **PO.** APO-CF results exist for Qwen3-4B and Llama-3.1-8B-Instruct on ESCI and MS MARCO, T1–T7 (not for Gemma). The selected instructions and the full selection records are shipped (`cpmr_experiment/esci_t/p1_T*`, `cpmr_experiment/esci_llama/p1_T*`, `cpmr_experiment/msm_po/`; summary in `docs/PO_SELECTION.md`) together with the proposer prompts and replies (`p1_exchange.json`). The proposer samples at temperature 1.0, so **re-running the PO stage does not reproduce the same candidates**; the frozen selections are the reference and the commands that regenerate the stage are commented out in the generated scripts. The meta-prompts shipped in `src/apocf_prompt.py` rebuild all 84 recorded meta-prompts (ESCI and MS MARCO; Qwen and Llama; T1–T7; three variants) byte for byte.
+* **Supplementary analyses are separate from the main protocol.** They reuse the trained models and their stored scores (or add the few scores they state) and are described in `docs/ADDITIONAL_ANALYSES.md`: training duration and learning rate with validation curves; BCE / MAE controls (T1–T7); label-length normalization; seed-level results and joint validation–test bootstrap; sampling-rank and judged-coverage audits; cross-year thresholds; independent calibration (ESCI Llama-3.1-8B T2 only). The independent-calibration extension to T1–T7 is not part of this repository version.
+* **Cross-year thresholds.** `analysis/msm_{t7,llama,gemma}_analysis.py` and the selected-threshold columns of `analysis/auc61_*.py`, `err62_*.py`, `err63_*.py` for MS MARCO select the threshold on the **other** TREC-DL year (the supplementary setting of Appendix C). In this version the main-protocol (`val200`) counterparts exist for the threshold levels, paired contrasts, 500-resample threshold variation and error counts (`po_val_analysis.py`); item-level error-transition lists and the AUC–κ link table for MS MARCO at the `val200` threshold are **not** re-implemented here.
 * **Precision.** Forward passes use BF16 blocks with FP32 head / log-softmax scoring. The Gemma FP32 appendix re-evaluates 12 representative checkpoints with FP32 weights; BF16/FP32 differences are reported in the paper, not hidden.
 * **Determinism.** Training uses fixed seeds, adapter initialization and example order (hashes recorded in the logs), but GPU kernels and dropout streams are not bit-deterministic; re-training gives scores that differ in the last digits, not the stored ones. Statistics on stored scores (bootstraps, thresholds) are deterministic.
-* **Checked without a GPU** (`checks/run_checks.py`, and restore on a CPU machine): imports/syntax, configs, manifest schemas and checksums, the tie rule of the threshold search, κ/AUC metrics on synthetic data, the command generator, path handling. **Not part of the checks:** an end-to-end training run from this repository on a clean machine (the GPU runs of the paper used the original working tree; the restored inputs and prompt builder were verified against it byte for byte, see `CHANGES_FROM_ORIGINAL.md`).
+* **Checked without a GPU.** `checks/run_checks.py` (imports/syntax, configs, manifest schemas and checksums including `val200` / `diag200`, frozen instructions, the rebuilt meta-prompts, the PO selection summary, the tie rule of the threshold search, κ/AUC metrics on synthetic data, the command generator including the PO and validation-scoring commands, path handling); the restore of the MS MARCO inputs (training pairs, `val200`, `diag200`, TREC-DL) reproduces the SHA-256 of the original pair files, and `po_val_analysis.py` (MS MARCO main protocol) and `esci_po_analysis.py` (ESCI PO) reproduce their stored tables (all checkpoint-level values to 1e-9) on the author's score files. **Not part of the checks:** an end-to-end training run from this repository on a clean machine, and execution of the supplementary scripts from a clean checkout (the per-example score files they read are not distributed).
 * **Compute.** The 5-run objective pilot took about 3.9 GPU-hours (training 3.0, evaluation 0.6, checks 0.2); the full study consists of several hundred training runs.
 
 ## 8. Sources and licenses of data and models

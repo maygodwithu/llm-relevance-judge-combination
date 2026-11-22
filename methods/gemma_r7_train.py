@@ -1,4 +1,4 @@
-"""Gemma-3-4B-IT SFT with one fixed relevance instruction (experiment log 135, step 3). Same recipe as the Qwen R runs (096 / 111: methods/train_rank_margin_mipro.py):
+"""Gemma-3-4B-IT SFT with one fixed relevance instruction (step 3). Same recipe as the Qwen R runs (096 / 111: methods/train_rank_margin_mipro.py):
 5,000 training query groups (one Relevant + one Irrelevant passage each, every query exposed once, order = load_query_groups(seed)), 625 optimizer updates x 8 query groups (the loss of a group is divided by 8, 16 sequences per update),
 loss of a group L = 0.5 (CE_pos + CE_neg) + 1.0 * softplus(-(m_pos - m_neg)); CE = token-mean cross entropy of the supervised tokens of one document (answer tokens + <end_of_turn>); m = logit(first token of 'Relevant') - logit(first token of 'Irrelevant')
 at the position before the first answer token (float32) = the training ranking score (the evaluation sequence-margin is a different quantity); AdamW (default betas / weight decay 0.01) lr 2e-5, linear warm-up 62 updates (10%) then linear decay to 0, no gradient clipping,

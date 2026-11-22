@@ -1,4 +1,4 @@
-"""ESCI-T Llama preparation (experiment log 166; CPU only, no model score): Llama-3.1-8B-Instruct tokenizer / chat-template audit of the frozen 159/161/165 rows (the product strings were cached with the Qwen tokenizer and are passed unchanged),
+"""ESCI-T Llama preparation (CPU only, no model score): Llama-3.1-8B-Instruct tokenizer / chat-template audit of the frozen 159/161/165 rows (the product strings were cached with the Qwen tokenizer and are passed unchanged),
 answer-token and terminator check, and the common max_length: the longest empty-instruction prompt over all frozen rows + the reserved instruction space (128 body tokens + suffix) + answer + <|eot_id|> + margin. Also the exact longest prompt of each of the seven ESCI-T texts.
     python methods/esci_llama_prep.py cpmr_experiment/esci_llama"""
 import hashlib

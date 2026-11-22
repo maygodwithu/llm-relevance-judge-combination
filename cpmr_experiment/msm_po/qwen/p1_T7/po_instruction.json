@@ -1,0 +1,1 @@
+{"T7_APOCF": "Read the query and assess the passage. Classify as Relevant if it directly addresses the query's need; otherwise, mark as Irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

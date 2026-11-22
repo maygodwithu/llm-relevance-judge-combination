@@ -1,4 +1,4 @@
-"""Instruction-only LoRA (experiment log 166): the LoRA branch is switched on only at the instruction token positions of the prompt, off everywhere else.
+"""Instruction-only LoRA: the LoRA branch is switched on only at the instruction token positions of the prompt, off everywhere else.
     y[b,t] = W x[b,t] + m[t] * scale * B(A(dropout(x[b,t])))        m[t] = 1 inside the instruction span, else 0
 Implemented as a forward hook on every lora_B module (peft adds the scaled B(A(x)) to the base output, so scaling the lora_B output by m is exactly the formula; the base branch is untouched,
 no no_grad / detach is used, so the answer loss still reaches the LoRA parameters through attention to the instruction K/V). The span is a constant [a, b) of token positions because the instruction

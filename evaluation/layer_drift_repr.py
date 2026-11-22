@@ -1,4 +1,4 @@
-"""Measure B of the layer drift diagnostic (experiment log 090): the same input through the base model + a seed's
+"""Measure B of the layer drift diagnostic: the same input through the base model + a seed's
 adapter ON and OFF (eval mode, no dropout, no grad), the change of the residual stream after every block at two
 token positions. Needs a GPU for ~1,000 short forwards and the Qwen3-4B weights.
 

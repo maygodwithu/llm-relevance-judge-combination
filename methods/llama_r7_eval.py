@@ -1,9 +1,9 @@
-"""Llama-3.1-8B-Instruct evaluation of the modified R7 relevance instructions (experiment log 139): TREC-DL 2019 / 2020, every original candidate pair (judged and unjudged), label + end-of-turn scoring (FP32 head).
+"""Llama-3.1-8B-Instruct evaluation of the modified R7 relevance instructions: TREC-DL 2019 / 2020, every original candidate pair (judged and unjudged), label + end-of-turn scoring (FP32 head).
 Model: meta-llama/Llama-3.1-8B-Instruct (local snapshot, revision recorded), LlamaForCausalLM; bf16 transformer blocks, the final RMSNorm (applied to float32 input), the UNTIED lm_head and log_softmax are evaluated in float32 at the supervised positions only.
 Prompt: official chat template of the tokenizer (incl. its default system paragraph with the fixed date), tokenised with add_special_tokens=False (the template string carries <|begin_of_text|>), followed by the answer tokens of the label and the assistant-turn terminator.
 Terminator: <|eot_id|> (128009) is the PRIMARY 'EOS' (the tokenizer's eos, emitted after an answer); <|end_of_text|> (128001) is stored as the alternative (sensitivity). Padding: <|finetune_right_pad_id|> (128004), right padding, masked.
 Per document and label: lp_label (sum of the answer tokens), lp_eot, lp_eos (= <|end_of_text|>), lp_first (first answer token), n_label_tokens. Primary margin m = [lp_label + lp_eot](Relevant) - [lp_label + lp_eot](Irrelevant); Relevant if m > 0.
-Instruction file: the Codex 139 manifest (display ids R0-R6 with source ids).
+Instruction file: the the experiment manifest (display ids R0-R6 with source ids).
     CUDA_VISIBLE_DEVICES=0 python methods/llama_r7_eval.py --jobs Base:R0 Base:R1 ... --instr_file <manifest json> --out_dir <dir> --local_files_only"""
 import argparse
 import gzip

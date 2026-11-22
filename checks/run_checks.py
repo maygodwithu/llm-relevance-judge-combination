@@ -62,7 +62,7 @@ sums = {}
 for l in open(M / "SHA256SUMS", encoding="utf-8"):
     h, n = l.split()
     sums[n] = h
-check("manifest SHA-256 sums", all(hashlib.sha256((M / n).read_bytes()).hexdigest() == h for n, h in sums.items()) and len(sums) >= 9)
+check("manifest SHA-256 sums", all(hashlib.sha256((M / n).read_bytes()).hexdigest() == h for n, h in sums.items()) and len(sums) >= 11)
 em = json.load(open(M / "esci_manifest.json", encoding="utf-8"))
 ok = True
 for s, meta in em["sets"].items():
@@ -79,6 +79,15 @@ byq = {}
 for r in tp:
     byq.setdefault(r["query_id"], []).append(r["label"])
 check("MS MARCO train manifest: 10,000 rows, 5,000 queries, one positive and one negative each", len(tp) == 10000 and len(byq) == 5000 and all(sorted(v) == ["Irrelevant", "Relevant"] for v in byq.values()))
+for nm in ("val200", "diag200"):
+    pr = list(csv.DictReader(open(ROOT / mm[nm]["manifest"], encoding="utf-8")))
+    qq = {}
+    for r in pr:
+        qq.setdefault(r["query_id"], []).append(r["label"])
+    check(f"MS MARCO {nm} manifest: {mm[nm]['rows']} rows, {mm[nm]['queries']} queries, one positive and one negative each", len(pr) == mm[nm]["rows"] == 400 and len(qq) == mm[nm]["queries"] == 200 and all(sorted(v) == ["Irrelevant", "Relevant"] for v in qq.values()))
+sets_q = {n_: {r["query_id"] for r in csv.DictReader(open(ROOT / mm[n_]["manifest"], encoding="utf-8"))} for n_ in ("val200", "diag200")}
+sets_q["train"] = set(byq)
+check("MS MARCO query ids disjoint: train / val200 / diag200", not (sets_q["train"] & sets_q["val200"]) and not (sets_q["train"] & sets_q["diag200"]) and not (sets_q["val200"] & sets_q["diag200"]))
 jp = list(csv.DictReader(open(M / "trec_dl_judged_pairs.csv", encoding="utf-8")))
 check("TREC-DL judged pairs: 2019 42 q / 1,102, 2020 54 q / 1,432", all(len([r for r in jp if r["year"] == y]) == mm["years"][y]["judged_pairs"] and len({r["query_id"] for r in jp if r["year"] == y}) == mm["years"][y]["queries"] for y in ("2019", "2020")) and (mm["years"]["2019"]["judged_pairs"], mm["years"]["2020"]["judged_pairs"]) == (1102, 1432))
 
@@ -95,13 +104,30 @@ try:
     n = ok_n = 0
     full = {e["display_id"]: e["full"] for e in man}
     for m in ("esci_t", "esci_llama"):
-        for T in ("T1", "T2", "T3"):
+        for T in [f"T{k}" for k in range(1, 8)]:
             c = json.load(open(ROOT / f"cpmr_experiment/{m}/p1_{T}/p1_confusion.json"))
             for r in json.load(open(ROOT / f"cpmr_experiment/{m}/p1_{T}/p1_exchange.json", encoding="utf-8")):
                 p = AP.build_apocf_prompt(full[T], c["tn"], c["fp"], c["fn"], c["tp"], domain="product", level="full", constraint_variant=r["variant"])
                 n += 1
                 ok_n += p == r["meta_prompt"] and hashlib.sha256(p.encode()).hexdigest() == r["meta_prompt_sha256"]
-    check("APO-CF meta-prompts rebuilt = recorded (18)", n == 18 and ok_n == 18, f"{ok_n}/{n}")
+    check("APO-CF meta-prompts rebuilt = recorded: ESCI, Qwen and Llama, T1-T7, three variants (42)", n == 42 and ok_n == 42, f"{ok_n}/{n}")
+    n = ok_n = 0
+    for m in ("qwen", "llama"):
+        for k in range(1, 8):
+            d = ROOT / f"cpmr_experiment/msm_po/{m}/p1_T{k}"
+            rr_ = json.load(open(d / "p1_result.json", encoding="utf-8")); c = json.load(open(d / "p1_confusion.json"))
+            for r in json.load(open(d / "p1_exchange.json", encoding="utf-8")):
+                p = AP.build_apocf_prompt(rr_["original_full"], c["tn"], c["fp"], c["fn"], c["tp"], domain="passage", level="full", constraint_variant=r["variant"])
+                n += 1
+                ok_n += p == r["meta_prompt"] and hashlib.sha256(p.encode()).hexdigest() == r["meta_prompt_sha256"]
+    check("APO-CF meta-prompts rebuilt = recorded: MS MARCO, Qwen and Llama, T1-T7, three variants (42)", n == 42 and ok_n == 42, f"{ok_n}/{n}")
+    # PO selection summary: changed / kept instructions of the four model-dataset combinations (the paper's PO scope: Qwen and Llama, ESCI and MS MARCO, T1-T7; no Gemma)
+    exp = {("esci_t", ""): {1, 2, 3, 4, 5, 6, 7}, ("esci_llama", ""): {2, 3, 5, 7}, ("msm_po", "qwen"): {1, 2, 3, 4, 5, 6, 7}, ("msm_po", "llama"): {2, 3}}
+    ok_po = True
+    for (root_, sub), want in exp.items():
+        got = {k for k in range(1, 8) if json.load(open(ROOT / f"cpmr_experiment/{root_}/{sub}/p1_T{k}/p1_result.json".replace("//", "/"), encoding="utf-8"))["selection"]["index"] != 0}
+        ok_po &= got == want
+    check("PO selections: changed instructions = Qwen ESCI T1-T7, Llama ESCI T2/T3/T5/T7, Qwen MS MARCO T1-T7, Llama MS MARCO T2/T3", ok_po)
 except Exception as e:  # noqa: BLE001
     check("APO-CF meta-prompt builder", False, str(e)[:100])
 
@@ -169,6 +195,14 @@ try:
     check("command generator: MS MARCO training tags unique", len(tags) == len(set(tags)), f"{len(tags)} tags")
     n_train = sum(1 for c in allc if "loss_train" in c or "esci_train.py" in c or "esci_llama_train.py" in c)
     check("command generator: number of training runs", n_train > 300, str(n_train))
+    n_po = {}
+    for mdl in ("qwen", "llama", "gemma"):
+        for ds_, fn in (("esci", MC.esci), ("msmarco", MC.msm)):
+            cs = [c for c in fn(mdl, {"po-base", "po-ce", "po-soft"}, list(range(1, 8)), [0, 1, 2], "train", "0") if not c.startswith("#")]
+            n_po[(mdl, ds_)] = sum("_APOCF" in c for c in cs)
+    check("command generator: PO training runs (Qwen ESCI 42, Llama ESCI 24, Qwen MS MARCO 42, Llama MS MARCO 12, none for Gemma)", n_po == {("qwen", "esci"): 42, ("qwen", "msmarco"): 42, ("llama", "esci"): 24, ("llama", "msmarco"): 12, ("gemma", "esci"): 0, ("gemma", "msmarco"): 0}, str(n_po))
+    vcs = [c for c in MC.msm("qwen", {"base", "ce", "soft", "any", "po-base", "po-ce", "po-soft"}, list(range(1, 8)), [0, 1, 2], "val", "0") if "msm_val_eval" in c]
+    check("command generator: val200 scoring commands for the MS MARCO models", len(vcs) >= 8, str(len(vcs)))
     pil = MC.pilot245("0")
     check("pilot generator: 5 training runs", sum("esci_loss_train_245.py" in c for c in pil) == 5)
 except Exception as e:  # noqa: BLE001

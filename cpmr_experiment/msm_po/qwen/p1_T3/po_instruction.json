@@ -1,0 +1,1 @@
+{"T3_APOCF": "Your task is to decide whether the passage directly and substantially addresses the query. Partial answers or indirect references are not sufficient. Information that only overlaps in topic without providing useful content toward the query's goal is considered irrelevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

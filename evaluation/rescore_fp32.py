@@ -1,4 +1,4 @@
-"""Re-score the TREC-DL 2019 candidates of final checkpoints with the final norm and the LM head in float32 (experiment log 130).
+"""Re-score the TREC-DL 2019 candidates of final checkpoints with the final norm and the LM head in float32.
 
 The reported score of a candidate is s = log P(Relevant) - log P(Irrelevant) (src/eval_rerank_mistral.py), computed from bf16 logits; the stored margins sit on a coarse
 grid (steps of about 0.25) and documents within ~0.004 of each other are ordered by rounding noise. Here the SAME teacher-forced forward is used, the pre-norm hidden

@@ -2,7 +2,7 @@
 The v2 input path that real training and evaluation use: v2 manifest instructions plus passages
 served from the passage cache instead of truncated per prompt at build time.
 
-This is the piece that was 0% through messages 017-040. Everything before it verified the
+This is the piece that was not exercised by the earlier checks. Everything before it verified the
 *producer* (the cache was written correctly); this verifies and supplies the *consumer* (training
 and evaluation actually read it).
 

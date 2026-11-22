@@ -1,4 +1,4 @@
-"""Final-checkpoint judged-pair evaluation of the MS MARCO four-loss pilot (experiment log 176): every judged candidate of TREC-DL 2019 (1,102 pairs) and 2020 (1,432 pairs), human grade >= 0, scored with the T1 instruction by the existing FP32 scorer
+"""Final-checkpoint judged-pair evaluation of the MS MARCO four-loss pilot: every judged candidate of TREC-DL 2019 (1,102 pairs) and 2020 (1,432 pairs), human grade >= 0, scored with the T1 instruction by the existing FP32 scorer
 evaluation/rescore_fp32.py score_both (the same teacher-forced forward, bf16 blocks, FP32 final norm / unembedding / log_softmax at the supervised positions, batch of 4 documents x 2 labels, label + terminator): m = log P(Relevant+terminator) - log P(Irrelevant+terminator).
 No nDCG, no unjudged candidate, no threshold search (the decision is m > 0). One process loads the model once and scores several checkpoints.
     CUDA_VISIBLE_DEVICES=0 python methods/msm_final_eval.py --models msm_A_s0:cpmr_experiment/msm_loss/checkpoints/msm_A_s0/ckpt_final.pt ... --out_dir cpmr_experiment/msm_loss/eval --local_files_only"""

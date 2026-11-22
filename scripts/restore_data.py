@@ -4,7 +4,7 @@
     python scripts/restore_data.py msmarco-cache [--local-files-only]      (needed only by the Qwen3-4B MS MARCO trainers; needs the Qwen3-4B tokenizer, revision pinned in the manifest)
 ESCI: official files of https://github.com/amazon-science/esci-data (shopping_queries_dataset_examples.parquet, shopping_queries_dataset_products.parquet; the renamed examples.parquet / products.parquet are accepted).
       Rows are rebuilt with methods/esci_audit.py::product_text (same field order, whitespace rule and 512-token budget of the Qwen3 tokenizer) and checked against the sha256 of the original row files.
-MS MARCO / TREC-DL: through the `ir_datasets` package (msmarco-passage/train, msmarco-passage/trec-dl-2019/judged, msmarco-passage/trec-dl-2020/judged; downloads the public collection on first use).
+MS MARCO (training pairs, val200, diag200) / TREC-DL: through the `ir_datasets` package (msmarco-passage/train, msmarco-passage/trec-dl-2019/judged, msmarco-passage/trec-dl-2020/judged; downloads the public collection on first use).
       The training pair file is rebuilt byte-identically (checked by sha256). The TREC-DL pool files are rebuilt with the judged pairs only (the unjudged BM25 pool entries never enter an evaluation); every query / document text is checked against its recorded sha256 and the judged-id hash of the evaluation is compared."""
 import argparse
 import csv
@@ -89,6 +89,29 @@ def msmarco(a):
     ok = h == mm["train_pairs_file_sha256"]
     print(f"train pairs {len(rows)} rows, {len(want_q)} queries, file sha256 {'OK' if ok else 'MISMATCH ' + h[:16]}")
     bad = not ok
+    # the two additional training-split sets of the protocol: validation (val200: PO selection and thresholds) and PO diagnostic (diag200); same record layout and text rule as the training pairs
+    for name in ("val200", "diag200"):
+        meta = mm[name]
+        prow = list(csv.DictReader(open(ROOT / meta["manifest"], encoding="utf-8")))
+        wq = {r["query_id"] for r in prow}
+        qt = {q.query_id: q.text for q in ds.queries_iter() if q.query_id in wq}
+        tx = {}
+        for did in sorted({r["passage_id"] for r in prow}):
+            d = store.get(did)
+            tx[did] = "Passage: " + f"{getattr(d, 'title', '') or ''}\n{d.text or ''}"
+        fo = ROOT / meta["restored_file"]
+        fo.parent.mkdir(parents=True, exist_ok=True)
+        with open(fo, "w", encoding="utf-8", newline="\n") as fh:
+            for r in prow:
+                assert sha(qt[r["query_id"]]) == r["query_sha256"] and sha(tx[r["passage_id"]]) == r["text_sha256"], (name, r["query_id"])
+                x = {"query_id": r["query_id"], "query": qt[r["query_id"]], "product_id": r["passage_id"], "product_text": tx[r["passage_id"]], "label": r["label"]}
+                x.update(json.loads(r["extra_json"]))
+                x["text_sha256"] = r["text_sha256"]
+                fh.write(json.dumps(x) + "\n")
+        h2 = hashlib.sha256(fo.read_bytes()).hexdigest()
+        ok2 = h2 == meta["pairs_file_sha256"]
+        bad |= not ok2
+        print(f"{name} pairs {len(prow)} rows, {len(wq)} queries, file sha256 {'OK' if ok2 else 'MISMATCH ' + h2[:16]}")
     qexp = {(r["year"], r["query_id"]): r["query_sha256"] for r in csv.DictReader(open(MAN / "trec_dl_queries.csv", encoding="utf-8"))}
     pairs = list(csv.DictReader(open(MAN / "trec_dl_judged_pairs.csv", encoding="utf-8")))
     for y in ("2019", "2020"):

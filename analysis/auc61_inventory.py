@@ -1,4 +1,4 @@
-"""Inventory of the stored raw scores for the 6.1 AUC analysis (experiment log 229): per evaluation set, condition and instruction the number of seeds with a stored score file (and the pair count), plus consistency of row keys / labels across all conditions of a set.   python auc61_inventory.py --root . --mods analysis"""
+"""Inventory of the stored raw scores for the 6.1 AUC analysis: per evaluation set, condition and instruction the number of seeds with a stored score file (and the pair count), plus consistency of row keys / labels across all conditions of a set.   python auc61_inventory.py --root . --mods analysis"""
 import argparse
 import json
 import sys

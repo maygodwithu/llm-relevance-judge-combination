@@ -1,4 +1,4 @@
-"""Core of the T1 instruction-only MIPROv2 experiment (experiment log 059/061/062). Torch-free, GPU-free, scorer / prompt LM / tokenizer are injected, so every rule here is unit-testable on the CPU.
+"""Core of the T1 instruction-only MIPROv2 experiment. Torch-free, GPU-free, scorer / prompt LM / tokenizer are injected, so every rule here is unit-testable on the CPU.
 
 Rules (frozen before any run):
   * one predictor, instructions = a BODY; the output suffix '\\n\\nOutput exactly one label: "Relevant" or "Irrelevant".' is fixed outside DSPy, demos = 0;
@@ -23,7 +23,7 @@ import dspy
 
 SUFFIX = '\n\nOutput exactly one label: "Relevant" or "Irrelevant".'
 EXTRA_BODY_TOKENS = 40
-# Rule revised on 2026-10-23 after the three APO-CF candidate TEXTS were seen but before any validation SCORE of an APO-CF candidate was viewed (experiment log 065): label NAMES may appear in a body ("A passage is "Relevant" only if ..."); only an OUTPUT-FORMAT instruction is invalid:
+# Rule revised on 2026-10-23 after the three APO-CF candidate TEXTS were seen but before any validation SCORE of an APO-CF candidate was viewed: label NAMES may appear in a body ("A passage is "Relevant" only if ..."); only an OUTPUT-FORMAT instruction is invalid:
 # the fixed sentence itself, or a sentence in which a verb of answering/labelling is followed by both label names joined by or/and. None of the 16 MIPROv2 candidates contains a label word, so no MIPROv2 validity changes.
 OUTPUT_FORMAT_SENTENCE = re.compile(r"Output exactly one label|\b(?:respond|answer|reply|output|return|classify|label)\w*\b[^.\n]{0,60}[\"']?(?:Relevant|Irrelevant)[\"']?[^.\n]{0,24}\b(?:or|and)\b[^.\n]{0,24}[\"']?(?:Irrelevant|Relevant)\b", re.IGNORECASE)
 PREFIX_BUDGET = 381          # max_length 384 - 2 label tokens - 1 EOS (the evaluator's budget for the longer label build)

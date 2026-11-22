@@ -1,4 +1,4 @@
-"""Analysis of experiment log 224 (Gemma-3-4B-it, MS MARCO original instructions T1-T7; own-instruction; final 625-update models; TREC-DL 2019 42 queries / 1,102 judged pairs and 2020 54 / 1,432; grades 2/3 = Relevant, 0/1 = Irrelevant).
+"""Analysis (Gemma-3-4B-it, MS MARCO original instructions T1-T7; own-instruction; final 625-update models; TREC-DL 2019 42 queries / 1,102 judged pairs and 2020 54 / 1,432; grades 2/3 = Relevant, 0/1 = Irrelevant).
 Paths (labels GM0-GM3 of the request 224 are written M0-M3 in the code): M0 Base, M1 token CE only, M2 CE + 1.0 soft kappa, M3 CE + 1.0 AnyLoss-like kappa (alpha 10); all new Gemma models (no reuse), final 625 updates, own instruction.
 Each model at t = 0 and with CROSS calibration: the threshold is the hard-kappa maximum over ALL judged pairs of the OTHER year (2020 -> applied to 2019, 2019 -> applied to 2020), candidates 0 / midpoints of consecutive distinct scores / below-all / above-all, ties -> 0, then smaller |t|, then smaller t; m > t; one threshold per (model, instruction, seed, year); never the same year's labels.
 Aggregation: per-instruction kappa -> equal-weight mean over the instruction set -> mean over seeds (no pooled confusion matrix). Paired test-query-cluster bootstrap, 10,000 resamples per year, np.random.default_rng(<year>), one resample set per year for every path / instruction / seed; thresholds fixed (only test-query variation).
@@ -168,7 +168,7 @@ def main():
     ci = lambda v, lv: (float(np.nanpercentile(v, (100 - lv) / 2)), float(np.nanpercentile(v, 100 - (100 - lv) / 2)))
     L = []
     P = L.append
-    P("Gemma-3-4B-it MS MARCO T1-T7 loss comparison (experiment log 224): TREC-DL 2019 (42 queries, 1,102 judged pairs) and 2020 (54 queries, 1,432); CROSS = threshold from the other year's judged pairs")
+    P("Gemma-3-4B-it MS MARCO T1-T7 loss comparison: TREC-DL 2019 (42 queries, 1,102 judged pairs) and 2020 (54 queries, 1,432); CROSS = threshold from the other year's judged pairs")
     ex = next(iter(D.values()))
     for y in YEARS:
         P(f"  {y}: Relevant (grade>=2) {100 * ex[y]['y'].mean():.1f}% of judged pairs")

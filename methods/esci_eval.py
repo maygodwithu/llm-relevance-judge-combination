@@ -1,4 +1,4 @@
-"""ESCI evaluation (experiment log 156; Qwen3-4B, second server): every judged row of a frozen row file (default: the 1,000 fixed test queries, 20,739 rows), label + <|im_end|> sequence scoring, FP32 head (tied embedding matrix), own instruction.
+"""ESCI evaluation (Qwen3-4B, second server): every judged row of a frozen row file (default: the 1,000 fixed test queries, 20,739 rows), label + <|im_end|> sequence scoring, FP32 head (tied embedding matrix), own instruction.
 Same scorer as the ANTIQUE / Qwen3-8B / Llama experiments (esci_core.score_batch: BF16 blocks, FP32 final norm / head / log_softmax at the supervised positions, template with enable_thinking=False, batch of 4 rows of one query in file order).
 Raw record per row: [lp_label(R), lp_eot(R), lp_eos(R), lp_label(I), lp_eot(I), lp_eos(I), lp_first(R), lp_first(I), n_label_tokens(R), n_label_tokens(I), binary truth (3 = E = Relevant, 0 = S/C/I), ESCI code (0 E, 1 S, 2 C, 3 I)];
 primary margin m = [lp_label + lp_eot](Relevant) - same(Irrelevant) > 0 -> Relevant.

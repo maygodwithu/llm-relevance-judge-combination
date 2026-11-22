@@ -1,0 +1,1 @@
+{"T4_APOCF": "Determine if the passage directly addresses the query's key question. Partial answers or related topics are not sufficient.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

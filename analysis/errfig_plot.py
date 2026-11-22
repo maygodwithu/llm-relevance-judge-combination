@@ -1,4 +1,4 @@
-"""Chapter 6.2 error-transition panels (experiment log 239): six independent panels, ESCI CE -> CE+soft kappa, T1-T7 x 3 seeds, default / selected thresholds, from shared/238 err62_results.json only (no recomputation).
+"""Chapter 6.2 error-transition panels: six independent panels, ESCI CE -> CE+soft kappa, T1-T7 x 3 seeds, default / selected thresholds, from shared/238 err62_results.json only (no recomputation).
    python errfig_plot.py --res <shared/238/results/err62_results.json> --out <dir>"""
 import argparse, hashlib, json, math
 from pathlib import Path

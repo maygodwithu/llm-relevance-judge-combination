@@ -1,4 +1,4 @@
-"""ESCI SFT (experiment log 156; Qwen3-4B Base, second server), CE-ONLY, one fixed relevance instruction (original P0-P4 or a selected APO-CF instruction).
+"""ESCI SFT (Qwen3-4B Base, second server), CE-ONLY, one fixed relevance instruction (original P0-P4 or a selected APO-CF instruction).
 Loss (all instructions, all seeds): CE = token mean over the supervised tokens (answer 'Relevant' / 'Irrelevant' tokens + <|im_end|>) of ONE row; a batch loss is the mean of the CE of its rows (equal weight per row). No ranking term: the frozen rows are a variable-size
 set of E / S / C / I products per query, the existing trainer takes forced positive-negative groups, and building pairs would need a new pair rule / weighting (156: CE-only is the default in that case).
 Rows: every row of cpmr_experiment/esci/audit/sft_rows.jsonl (<= 20 products of each of 5,000 frozen queries), each exposed ONCE (1 epoch) in a seed-specific order (numpy default_rng(seed) permutation of all rows, shared by every instruction of that seed),

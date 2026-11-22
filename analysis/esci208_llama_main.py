@@ -1,4 +1,4 @@
-"""Analysis of experiment log 208 (Llama-3.1-8B-Instruct, ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction): Llama completion of the Qwen 204 comparison.
+"""Analysis (Llama-3.1-8B-Instruct, ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction): Llama completion of the Qwen 204 comparison.
 Paths: L0 Base original text, L1 original CE (168), L2 original CE + soft kappa (lambda 1; T1-T3 from 207, T4-T7 new), L3 APO-CF -> CE (168; frozen Llama APO-CF text: T2 shorter, T3 bare, T5 shorter, T7 similar; T1, T4, T6 kept the original text, so L3 = L1 there: same models, difference exactly 0, no double counting),
 L4 original CE + AnyLoss-like kappa (lambda 1, alpha 10, new), L5 APO-CF -> CE + soft kappa (T2, T3 new; T1 kept the original text so L5 = L2 there; T1-T3 fixed subset, never averaged into the T4-T7 or T1-T7 sets), L0P Base with the frozen APO-CF text (reference).
 Each path at t = 0 and with its own validation threshold (selection 200 queries / 4,047 rows, hard-kappa maximum; the Base threshold is never transferred). Test = frozen test300 (300 queries / 6,078 rows).
@@ -117,7 +117,7 @@ def main():
     ci = lambda v, lv: (float(np.percentile(v, (100 - lv) / 2)), float(np.percentile(v, 100 - (100 - lv) / 2)))
     L = []
     P = L.append
-    P("Llama ESCI completion (experiment log 208), Llama-3.1-8B-Instruct; test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
+    P("Llama ESCI completion, Llama-3.1-8B-Instruct; test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
     P("completeness (models with both test300 and validation scores; PO-kept instructions T1, T4, T6 reuse L1 / L2 / L0):")
     for c in PATHS:
         P(f"  {c}: " + " ".join(f"T{T}:{sum((c, T, s) in D for s in seeds(c))}/{len(seeds(c))}" for T in TS))

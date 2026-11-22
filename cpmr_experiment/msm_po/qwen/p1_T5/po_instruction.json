@@ -1,0 +1,1 @@
+{"T5_APOCF": "Mark the passage relevant if it directly addresses the query's main question, even if only partially. Do not consider topical overlap alone.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

@@ -1,4 +1,4 @@
-"""Four-loss pilot trainer (experiment log 169; Qwen3-4B Base, ESCI-T1, seed 0; same recipe as esci_train.py of 165): --loss ce | bce | softk | anyk.
+"""Four-loss pilot trainer (Qwen3-4B Base, ESCI-T1, seed 0; same recipe as esci_train.py of 165): --loss ce | bce | softk | anyk.
 ce   : esci_core.ce_rows (identical to esci_train.py: token mean of the correct label + <|im_end|>, mean over the rows).
 bce  : mean over the 16 rows of softplus(m) - y m, m = s_plus - s_minus (sums of log P(label + <|im_end|>), both labels teacher forced, FP32 norm / head / log_softmax).
 softk / anyk : one loss over the 16 rows (loss_from_m); exact two-pass computation (pass 1 no grad -> 16 margins -> dL/dm; pass 2 per micro-batch with grad and the restored dropout RNG state). Single-class updates (r = 0 or 1): loss / gradient 0, optimizer.step skipped

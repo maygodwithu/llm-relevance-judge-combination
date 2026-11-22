@@ -1,6 +1,6 @@
-"""Stage 1 of the ESCI-T Llama APO-CF run (experiment log 166; Llama-3.1-8B-Instruct Base is judge AND proposer, one refinement per instruction, then freeze; port of antique_apocf_p1.py with the product domain, rules unchanged except the data and the selection metric):
+"""Stage 1 of the ESCI-T Llama APO-CF run (Llama-3.1-8B-Instruct Base is judge AND proposer, one refinement per instruction, then freeze; port of antique_apocf_p1.py with the product domain, rules unchanged except the data and the selection metric):
   1. Diagnostic confusion: Base + original Pk on ALL judged rows of the 200 frozen diagnostic queries (truth: ESCI label E = Relevant, S/C/I = Irrelevant); decision = label+<|eot_id|> margin > 0.
-  2. Proposer: the UNCHANGED APO-CF meta-prompt (sftpo/src/rewriter.py build_apocf_prompt, domain='product', level='full') once per variant (shorter, similar, bare) through the official Qwen3 chat template with enable_thinking=False.
+  2. Proposer: the UNCHANGED APO-CF meta-prompt (the original APO-CF implementation build_apocf_prompt, domain='product', level='full') once per variant (shorter, similar, bare) through the official Qwen3 chat template with enable_thinking=False.
      temperature 1.0, top_p 1.0, top_k disabled, max_new_tokens 512, torch.manual_seed(0) once before the first call, order shorter -> similar -> bare, batch 1, bf16. Prompts and raw replies are written to disk BEFORE anything is scored.
      No addendum, no regeneration, no repair, no human edit.
   3. Fixed parser (as in 147/151/154). 4. Validity: mipro_core.BodyChecker (empty / more than one paragraph / output-format instruction / more than 128 tokens) + unbalanced quotes + generation ended without an end token + duplicates.

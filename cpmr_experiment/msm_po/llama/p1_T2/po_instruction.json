@@ -1,0 +1,1 @@
+{"T2_APOCF": "Decide whether the passage directly addresses the query's information need by providing substantial information related to the question. A passage that shares the same topic as the query is not necessarily relevant unless it goes beyond mere topic overlap.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

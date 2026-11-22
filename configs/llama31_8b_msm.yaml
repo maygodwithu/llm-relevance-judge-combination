@@ -1,4 +1,4 @@
-# experiment log 139: Llama-3.1-8B-Instruct, LlamaForCausalLM (text only). Target modules: the q/k/v/o projections of the 32 decoder layers (128 modules, 6,815,744 LoRA parameters at r = 8).
+# Llama-3.1-8B-Instruct, LlamaForCausalLM (text only). Target modules: the q/k/v/o projections of the 32 decoder layers (128 modules, 6,815,744 LoRA parameters at r = 8).
 model_name: "meta-llama/Llama-3.1-8B-Instruct"
 
 lora:

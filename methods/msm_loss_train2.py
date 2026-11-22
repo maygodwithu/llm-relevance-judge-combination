@@ -1,4 +1,4 @@
-"""MS MARCO additional conditions of the four-loss pilot (experiment log 178; same server, data, model, order, optimizer, config as msm_loss_train.py of experiment log 177, which is imported and not modified):
+"""MS MARCO additional conditions of the four-loss pilot (same server, data, model, order, optimizer, config as msm_loss_train.py, which is imported and not modified):
 --loss E : L_CE + lam * L_K            (L_CE = mean over the 8 groups of 0.5 (CE_pos + CE_neg), the loss of condition B)
 --loss F : L_CE + L_rank + lam * L_K   (L_CE + L_rank is the loss of condition A; L_rank = mean over the 8 groups of softplus(-(m_pos - m_neg)), first-token margins, coefficient 1)
 --loss G : L_AK alone (AnyLoss-like kappa, alpha 10: q = sigmoid(10 (p - .5)), p = sigmoid(m); the same formula as condition D with q instead of p)

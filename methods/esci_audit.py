@@ -1,4 +1,4 @@
-"""ESCI extension (experiment log 156; Qwen3-4B Base, second server) - CPU audit, split, row freeze, product-text cache, token audit. No model scores, no GPU.
+"""ESCI extension (Qwen3-4B Base, second server) - CPU audit, split, row freeze, product-text cache, token audit. No model scores, no GPU.
 Data: official ESCI (amazon-science/esci-data) examples/products parquet as stored in <server-home>/esci_official (checked against the official row counts), product_locale 'us', small_version == 1, official train / test.
 Label: E (exact) = Relevant, S/C/I = Irrelevant; the original E/S/C/I label is kept in every row.
 Split (frozen before any score): normalized query = NFKC, lower case, whitespace collapsed. Train-side normalized queries that also occur in the official test are removed before sampling (rule stated here). The remaining distinct
@@ -171,7 +171,7 @@ def main():
         meta[k] = {"rows": len(recs), "queries": len({x["nq"] for x in recs}), "sha256": hashlib.sha256(f.read_bytes()).hexdigest()}
         P(f"{k:5s}: rows {len(recs):,}, product texts cut to the budget {stat[(k, 'cut')]:,} ({100 * stat[(k, 'cut')] / len(recs):.1f}%), mean product tokens {np.mean([x['product_tokens'] for x in recs]):.0f} (full {np.mean([x['product_tokens_full'] for x in recs]):.0f})")
     (out / "splits.json").write_text(json.dumps({"seed": SEED, "rule": __doc__, "diag": diag, "sel": sel, "sft": sft, "test": test_q, "sets": meta, "product_budget": B, "max_length": max_length, "overlap_removed": len(ov)}, ensure_ascii=False, indent=1), encoding="utf-8")
-    man = {"note": "ESCI-P0..P4 originals of experiment log 156, frozen before any score", "entries": [{"display_id": k, "source_id": k, "full": v + SUFFIX, "sha256_full": sha(v + SUFFIX)} for k, v in P_TEXT.items()]}
+    man = {"note": "ESCI-P0..P4 originals, frozen before any score", "entries": [{"display_id": k, "source_id": k, "full": v + SUFFIX, "sha256_full": sha(v + SUFFIX)} for k, v in P_TEXT.items()]}
     (out / "esci_p_manifest.json").write_text(json.dumps(man, indent=1), encoding="utf-8")
     (out / "esci_audit.txt").write_text("\n".join(L) + "\n", encoding="utf-8")
     for k in meta:

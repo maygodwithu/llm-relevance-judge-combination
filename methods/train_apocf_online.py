@@ -1,4 +1,4 @@
-"""APOCF-online pilot (experiment log 078, decisions in 080): does adding ONE instruction found by
+"""APOCF-online pilot (decisions in 080): does adding ONE instruction found by
 APOCF part-way through training improve retrieval under the ORIGINAL instruction?
 
 Three commands, run in this order. Nothing here is started by importing the module.

@@ -1,4 +1,4 @@
-"""Analysis of experiment log 217 (Gemma-3-4B-it, ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction).
+"""Analysis (Gemma-3-4B-it, ESCI T1-T7; seeds 0/1/2; final 625-update models; own instruction).
 Paths: G0 Base, G1 token CE, G2 CE + 1.0 soft kappa, G3 CE + 1.0 AnyLoss-like kappa (alpha 10); training: Base start, same seed initial adapter and row order across the three losses, lambda 1.0 fixed beforehand.
 Each path at t = 0 and with its own validation threshold (selection 200 queries / 4,047 rows, hard-kappa maximum over all distinct-score partitions, ties -> 0 then smaller |t|; one threshold per model; the Base threshold is never transferred). Test = frozen test300 (300 queries / 6,078 rows).
 Order of aggregation: per-instruction kappa -> equal-weight mean over the instruction set -> mean over seeds. Paired test-query cluster bootstrap, 2,000 resamples, np.random.default_rng(0), one resample set for every path / instruction / seed (thresholds, texts and trained models fixed).
@@ -96,7 +96,7 @@ def main():
     ci = lambda v, lv: (float(np.percentile(v, (100 - lv) / 2)), float(np.percentile(v, 100 - (100 - lv) / 2)))
     L = []
     P = L.append
-    P("Gemma-3-4B-it ESCI study (experiment log 217); test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
+    P("Gemma-3-4B-it ESCI study; test300 300 queries / 6,078 rows; validation 200 queries / 4,047 rows")
     P("completeness (models with both test300 and validation scores):")
     for c in PATHS:
         P(f"  {c}: " + " ".join(f"T{T}:{sum((c, T, s) in D for s in seeds(c))}/{len(seeds(c))}" for T in TS))

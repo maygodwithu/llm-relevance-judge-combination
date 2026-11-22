@@ -1,4 +1,4 @@
-"""Final-checkpoint scorer audit of Gemma-3-4B-it (experiment log 231 / 232): one checkpoint, its evaluation set(s), on the fixed sample of audit/sample_manifest.json. No threshold search, no training.
+"""Final-checkpoint scorer audit of Gemma-3-4B-it: one checkpoint, its evaluation set(s), on the fixed sample of audit/sample_manifest.json. No threshold search, no training.
 Paths (all on the SAME trained adapter loaded with layer_drift_repr.load_adapter; eval mode; no_grad; sdpa):
   A4  original scorer function (esci_gemma_core.score_batch / gemma_r7_eval.score_batch), batch 4 documents per label, right padding, query-wise chunking of the original evaluation (reproduces the stored raw scores)
   A1  the same function, batch 1

@@ -1,4 +1,4 @@
-"""Codex 245 analysis (CPU): Qwen3-4B, ESCI, T1 (trained and evaluated), seed 0, final update 625. Eight conditions, own-instruction scores on the frozen validation (sel: 200 queries / 4,047 pairs) and test300 (300 queries / 6,078 pairs).
+"""the experiment analysis (CPU): Qwen3-4B, ESCI, T1 (trained and evaluated), seed 0, final update 625. Eight conditions, own-instruction scores on the frozen validation (sel: 200 queries / 4,047 pairs) and test300 (300 queries / 6,078 pairs).
   CE, SOFT1 (CE + soft kappa lam 1), ANY10 (CE + AnyLoss-like kappa lam 1 alpha 10)  -- reused (165 / 184 / 185)
   SOFT03, SOFT3 (soft kappa lam .3 / 3), ANY5, ANY20 (alpha 5 / 20, lam 1), BCE (CE + 1.0 label-margin BCE)  -- new (245)
 Margin m = [lp_label + lp_eot](Relevant) - same(Irrelevant) (raw fields 0 + 1 - 3 - 4), decision m > t, gold = field 10 == 3 (E).

@@ -1,0 +1,1 @@
+{"T3_APOCF": "Your task is to determine whether the passage provides a clear and direct answer to the query's information need. A relevant passage must either directly address the query or provide essential, query-specific information. Topical overlap alone will not qualify a passage as relevant.\n\nOutput exactly one label: \"Relevant\" or \"Irrelevant\"."}

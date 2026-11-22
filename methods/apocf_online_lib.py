@@ -1,4 +1,4 @@
-"""Pieces for the APOCF-online pilot (experiment log 078/079/080). New file: no shared-core file is
+"""Pieces for the APOCF-online pilot. New file: no shared-core file is
 edited (docs/WORKING_AGREEMENT.md section 1).
 
 Four independent parts, each testable without a GPU:
@@ -199,7 +199,7 @@ def validate_generated_instruction(text, base_instruction, tokenizer, max_tokens
 
 def load_apocf_module(rewriter_path=DEFAULT_REWRITER_PATH):
     """Load the APO-CF prompt builder (src/apocf_prompt.py) by file path."""
-    spec = importlib.util.spec_from_file_location("sftpo_rewriter", rewriter_path)
+    spec = importlib.util.spec_from_file_location("apocf_rewriter", rewriter_path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     for name in ("build_apocf_prompt",):

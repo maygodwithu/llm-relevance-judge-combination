@@ -1,4 +1,4 @@
-"""Shared pieces of the ESCI-T Llama extension (experiment log 166; Llama-3.1-8B-Instruct, second server; port of esci_core.py: Llama chat template without enable_thinking, <|eot_id|> terminator, untied lm_head): prompt builder, label+<|im_end|> scorer (same path as qwen8_r7_eval.score_batch / antique_eval: BF16 blocks, FP32 final norm / head / log_softmax at the supervised
+"""Shared pieces of the ESCI-T Llama extension (Llama-3.1-8B-Instruct, second server; port of esci_core.py: Llama chat template without enable_thinking, <|eot_id|> terminator, untied lm_head): prompt builder, label+<|im_end|> scorer (same path as qwen8_r7_eval.score_batch / antique_eval: BF16 blocks, FP32 final norm / head / log_softmax at the supervised
 positions, Llama chat template, right padding) and the CE row forward used by the trainer. The product block is the cached text of methods/esci_audit.py (does not depend on the instruction); it already carries its 'Product:' marker.
 Prompt: '<instruction>\\n\\nQuery: <query>\\n<product block>' as the user turn of the official chat template; answer 'Relevant' / 'Irrelevant' + <|eot_id|>."""
 import torch

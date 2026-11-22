@@ -1,4 +1,4 @@
-"""Shared pieces for the layer-wise drift diagnostic on the Single-CE-K2 checkpoints (experiment log 090).
+"""Shared pieces for the layer-wise drift diagnostic on the Single-CE-K2 checkpoints.
 
 Measure A (weights, CPU):   per transformer block, ||dW||_F / ||W_base||_F for the learned LoRA update.
 Measure B (representation): same inputs with the adapter ON and OFF (eval mode, no grad), the relative L2 and
