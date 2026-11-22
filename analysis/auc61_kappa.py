@@ -46,6 +46,7 @@ def esci_sel(sid, cond, T, s):
 
 
 out = {}
+out_val = {}          # main protocol: MS MARCO selected threshold = hard-kappa maximizer on the val200 scores of the same checkpoint (one threshold for both TREC-DL years)
 for sid in D.SETS:
     for cond in ("BASE", "CE", "SOFT", "ANY"):
         for T in D.TS:
@@ -64,6 +65,20 @@ for sid in D.SETS:
                     ro = D.get(other, cond, T, s)
                     thr, vk = best(ro[1], ro[2])
                 out[(sid, cond, T, s)] = (k0, k_at(m, y, thr), float(thr))
+                if sid.startswith("ESCI"):
+                    out_val[(sid, cond, T, s)] = out[(sid, cond, T, s)]
+                else:
+                    v = D.msm_val200(sid, cond, T, s)
+                    if v is None:
+                        continue
+                    tv, _ = best(v[1], v[2])
+                    out_val[(sid, cond, T, s)] = (k0, k_at(m, y, tv), float(tv))
 Path(a.out).mkdir(parents=True, exist_ok=True)
 pickle.dump(out, open(Path(a.out) / "kappa.pkl", "wb"))
-print("kappa cells", len(out))
+print("kappa cells (ESCI validation split; MS MARCO cross-year reference)", len(out))
+if out_val and any(k[0].startswith("MS") for k in out_val):
+    out_val[("__msm_selection__",)] = "val200"
+    pickle.dump(out_val, open(Path(a.out) / "kappa_val200.pkl", "wb"))
+    print("kappa_val200 cells (ESCI validation split; MS MARCO val200 threshold)", len(out_val) - 1)
+else:
+    print("no val200 scores found under cpmr_experiment/msm_val/eval: kappa_val200.pkl not written")

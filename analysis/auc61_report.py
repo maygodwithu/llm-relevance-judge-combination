@@ -1,4 +1,4 @@
-"""Aggregation, contrasts and tables of the chapter 6.1 AUC re-analysis. Input: boot_<set>.pkl (auc61_boot.py), kappa.pkl (auc61_kappa.py), and the reported values of chapter5_results.json for verification.
+"""Aggregation, contrasts and tables of the chapter 6.1 AUC re-analysis. Input: boot_<set>.pkl (auc61_boot.py), kappa_val200.pkl / kappa.pkl (auc61_kappa.py), and the reported values of chapter5_results.json for verification.
 Aggregation order (as in the 5th chapter): AUC (or kappa) per (instruction, seed) over all evaluated pairs -> equal-weight mean over the instructions of the scope -> mean over seeds. Base has no training seed: its instruction-mean is common to every seed (not an independent repetition).
 Each bootstrap draw repeats this aggregation with the resample's AUC values; contrasts are differences of the aggregated per-draw values. Percentile CIs: 95% and the family-adjusted CI (ESCI per model: 3 contrasts -> 98.33%; MS MARCO per model: 3 contrasts x 2 years = 6 -> 99.1667%; PO T1-T3 per model: 3 contrasts -> 98.33%). Exploratory T1-T7 PO auxiliary CIs are 95% only.
     python auc61_report.py --pk <dir with boot_*.pkl and kappa.pkl> --ch5 <chapter5_results.json> --out <dir>"""
@@ -76,13 +76,14 @@ def contrast(ev, K, sid, hi, lo, Ts, adj):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pk", required=True); ap.add_argument("--ch5", required=True); ap.add_argument("--out", required=True)
+    ap.add_argument("--kappa_file", default=None, help="kappa table in --pk: kappa_val200.pkl (main protocol, MS MARCO threshold from val200; default when present) or kappa.pkl (supplementary cross-year setting)")
     a = ap.parse_args()
     t0 = time.time()
     out = Path(a.out); out.mkdir(parents=True, exist_ok=True)
     pk = Path(a.pk)
     SETS = ["ESCI-Qwen", "ESCI-Llama", "ESCI-Gemma", "MS-Qwen-2019", "MS-Qwen-2020", "MS-Llama-2019", "MS-Llama-2020", "MS-Gemma-2019", "MS-Gemma-2020"]
     EV = {s: Ev(pk / f"boot_{s}.pkl") for s in SETS}
-    K = pickle.load(open(pk / "kappa.pkl", "rb"))
+    K = pickle.load(open(pk / (a.kappa_file or ("kappa_val200.pkl" if (pk / "kappa_val200.pkl").exists() else "kappa.pkl")), "rb"))
     ch5 = json.load(open(a.ch5, encoding="utf-8"))
     R = dict(meta=dict(), checks=[], panelA=[], contrasts=[], po=[], link=[], aucs=[])
     # ------------------------------------------------------------- scopes

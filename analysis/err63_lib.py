@@ -17,6 +17,8 @@ ALL7 = tuple(range(1, 8))
 def init(root, mods, kappa_pkl):
     global SEL_GOLD, QC
     L.init(root, mods, kappa_pkl)
+    global MSM_SEL
+    MSM_SEL = L.K.get(("__msm_selection__",), "cross")          # "val200" for kappa_val200.pkl (main protocol), "cross" for kappa.pkl (supplementary cross-year setting)
     SEL_GOLD = L.SEL_GOLD
     QC = L.D._st["QC"]
 
@@ -31,8 +33,10 @@ def other_year_sid(sid):
 
 
 def val_arrays(sid, cond, T, s):
-    """validation / CROSS selection scores of the checkpoint: -> (ks, m, y). ESCI: stored validation-selection scores (as in the reports); MS MARCO: the other year's judged pairs (CROSS)."""
+    """threshold-selection scores of the checkpoint: -> (ks, m, y). ESCI: stored validation-selection scores; MS MARCO: the val200 scores (main protocol, kappa_val200.pkl) or the other year's judged pairs (supplementary cross-year setting, kappa.pkl)."""
     if sid.startswith("MS"):
+        if MSM_SEL == "val200":
+            return L.D.msm_val200(sid, cond, T, s)
         r = L.load(other_year_sid(sid), cond, T, s)
         return None if r is None else (r["ks"], r["m"], r["y"])
     st = {"ESCI-Qwen": L.D._st["qs"], "ESCI-Llama": L.D._st["ls"], "ESCI-Gemma": L.D._st["gs"]}[sid]

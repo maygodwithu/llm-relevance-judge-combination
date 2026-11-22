@@ -98,3 +98,5 @@ Files added (copied from the working tree that produced the results, with the sa
 | `docs/` | `PO_SELECTION.md`, `ADDITIONAL_ANALYSES.md`, `MIGRATION.md` |
 
 Changed files: `README.md`; `experiments/make_commands.py` (PO ranges ESCI Qwen T1–T7 / Llama T2,T3,T5,T7; MS MARCO PO commands; stage `val`); `scripts/restore_data.py` and `scripts/verify_data.py` (restore / check `val200`, `diag200`); `checks/run_checks.py` (meta-prompt rebuild for both domains, PO summary, new manifests, PO / validation commands); `data/manifests/SHA256SUMS`.
+
+Selection data of the MS MARCO thresholds (main protocol): `analysis/auc61_data.py` gained `msm_val200` (loads the `val200` scores of a checkpoint); `analysis/auc61_kappa.py` additionally writes `kappa_val200.pkl` (the existing `kappa.pkl` is written unchanged); `analysis/err63_lib.py` uses the `val200` scores as MS MARCO selection data when the kappa table is `kappa_val200.pkl`; `analysis/auc61_report.py` accepts `--kappa_file`. No change of the threshold rule, the transition counts or the bootstrap.

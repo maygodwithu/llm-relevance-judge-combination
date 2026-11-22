@@ -54,6 +54,35 @@ def _escid(sid, cond, T, s):
     raise KeyError(sid)
 
 
+_VPRE = {"Qwen": "msmValEval_", "Llama": "msmValLlamaEval_", "Gemma": "msmValGemmaEval_"}
+_vcache = {}
+
+
+def msm_val200(sid, cond, T, s):
+    """Scores of a MS MARCO checkpoint on the 400 validation pairs val200 (main-protocol threshold data), written by methods/msm_val_eval*.py -> (ks, m, y) or None.
+    Same checkpoint tag and instruction as the TREC-DL scores of the same cell; the file name carries no year, so both years of a model share one threshold."""
+    _, mdl, _yr = sid.split("-")
+    mod = {"Qwen": _st["MQ"], "Llama": _st["ML"], "Gemma": _st["MG"]}[mdl]
+    pth = {"BASE": "M0", "CE": "M1", "SOFT": "M2", "ANY": "M3"}.get(cond)
+    if pth is None or (pth == "M0" and s != 0):
+        return None
+    tg = mod.tags(pth, T, s)
+    if tg is None:
+        return None
+    key = (mdl, tg, T)
+    if key not in _vcache:
+        f = ROOT / "cpmr_experiment/msm_val/eval" / f"{_VPRE[mdl]}{tg}__T{T}__val200.json.gz"
+        if not f.exists():
+            _vcache[key] = None
+        else:
+            import gzip, json
+            r = json.load(gzip.open(f, "rt", encoding="utf-8"))
+            run, gr = r["run_fp32"], r["grades"]
+            ks = [(q, d) for q in sorted(run) for d in sorted(run[q])]
+            _vcache[key] = (ks, np.array([run[q][d] for q, d in ks]), np.array([gr[q][d] >= 2 for q, d in ks]))
+    return _vcache[key]
+
+
 def esci_is_alias(sid, cond, T):
     """True when a PO condition is the original text of the same T (Llama PO kept the original text for T1, T4, T6): same stored scores, counted as difference 0, never as an independent run"""
     return sid == "ESCI-Llama" and cond in ("POBASE", "POCE", "POSOFT") and T in _st["LM"].PO_KEPT
