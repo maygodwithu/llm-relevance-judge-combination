@@ -1,0 +1,25 @@
+variant,objective,seed,quantity,T_mean
+orig,Base,0,k0,0.223033110724828
+orig,Base,0,k_shared,0.297561357782704
+orig,Base,0,k_indep,0.2897835329002665
+orig,CE+soft kappa,0,k0,0.40541312451108746
+orig,CE+soft kappa,1,k0,0.40234902506415227
+orig,CE+soft kappa,2,k0,0.4019353049998691
+orig,CE+soft kappa,0,k_shared,0.40238507502460535
+orig,CE+soft kappa,1,k_shared,0.3962968227110509
+orig,CE+soft kappa,2,k_shared,0.3999792161031697
+orig,CE+soft kappa,0,k_indep,0.3983892378267622
+orig,CE+soft kappa,1,k_indep,0.39427038045139273
+orig,CE+soft kappa,2,k_indep,0.3950040356767346
+po,Base,0,k0,0.2430043870903725
+po,Base,0,k_shared,0.30949974990628043
+po,Base,0,k_indep,0.30511327569453695
+po,CE+soft kappa,0,k0,0.40975412625361
+po,CE+soft kappa,1,k0,0.40814606892608335
+po,CE+soft kappa,2,k0,0.4092423046926773
+po,CE+soft kappa,0,k_shared,0.4048321931172502
+po,CE+soft kappa,1,k_shared,0.4000725547708838
+po,CE+soft kappa,2,k_shared,0.4030422526918885
+po,CE+soft kappa,0,k_indep,0.40422674509816836
+po,CE+soft kappa,1,k_indep,0.39787894810250657
+po,CE+soft kappa,2,k_indep,0.3970617234555104

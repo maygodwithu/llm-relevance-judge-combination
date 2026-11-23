@@ -28,6 +28,13 @@
    "queries": 300,
    "rows_file_sha256": "a6f83c1c9e2431eefb250145b3acaafcc35c989caea1d4815df0d7b25f0672a1",
    "E": 2857
+  },
+  "calib": {
+   "rows": 3939,
+   "queries": 200,
+   "rows_file_sha256": "bcfe73aa09cdd2ed20ec88567c270ba720185699bed085d35da3ecf3e2b3a928",
+   "E": 1682
   }
- }
+ },
+ "calib_rule": "independent calibration pool, fixed before any score was computed: the queries of the official training split (normalized query text, not also in the test split) are sorted, permuted with numpy default_rng(20261031) (the seed of the splits), the first 5,400 (the training, diagnostic and validation queries) are left out, queries that appear in the training file of an earlier project are skipped, and the next 200 queries are taken with every judged product (rows built exactly like the other sets; 512-token product budget); disjoint by query from sft2, diag, sel and test300 (checked by scripts/verify_data.py)"
 }

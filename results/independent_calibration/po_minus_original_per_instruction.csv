@@ -1,0 +1,43 @@
+instruction,po_text_changed,objective,regime,diff_seed_mean,seed_diffs,positive_seeds,ci95_low,ci95_high
+T1,False,Base,t=0,0.000000,0.000000,0,0.000000,0.000000
+T1,False,Base,shared validation t*,0.000000,0.000000,0,0.000000,0.000000
+T1,False,Base,independent calibration t*,0.000000,0.000000,0,0.000000,0.000000
+T1,False,CE+soft kappa,t=0,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T1,False,CE+soft kappa,shared validation t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T1,False,CE+soft kappa,independent calibration t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T2,True,Base,t=0,0.021134,0.021134,1,-0.009013,0.051295
+T2,True,Base,shared validation t*,0.034733,0.034733,1,-0.000496,0.069298
+T2,True,Base,independent calibration t*,0.045960,0.045960,1,0.014607,0.077473
+T2,True,CE+soft kappa,t=0,0.027358,0.030651;0.016592;0.034830,3,0.009327,0.045821
+T2,True,CE+soft kappa,shared validation t*,0.011886,0.012656;0.006248;0.016753,3,-0.006406,0.030892
+T2,True,CE+soft kappa,independent calibration t*,0.017521,0.022583;0.008178;0.021801,3,-0.000349,0.035462
+T3,True,Base,t=0,0.049842,0.049842,1,0.034771,0.065325
+T3,True,Base,shared validation t*,0.023226,0.023226,1,0.006511,0.039979
+T3,True,Base,independent calibration t*,0.020434,0.020434,1,0.001894,0.038420
+T3,True,CE+soft kappa,t=0,-0.006503,-0.005009;-0.006030;-0.008470,0,-0.020611,0.007149
+T3,True,CE+soft kappa,shared validation t*,-0.011444,-0.006775;-0.011634;-0.015922,0,-0.026873,0.003749
+T3,True,CE+soft kappa,independent calibration t*,-0.005412,0.004130;-0.016490;-0.003875,1,-0.018314,0.007378
+T4,False,Base,t=0,0.000000,0.000000,0,0.000000,0.000000
+T4,False,Base,shared validation t*,0.000000,0.000000,0,0.000000,0.000000
+T4,False,Base,independent calibration t*,0.000000,0.000000,0,0.000000,0.000000
+T4,False,CE+soft kappa,t=0,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T4,False,CE+soft kappa,shared validation t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T4,False,CE+soft kappa,independent calibration t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T5,True,Base,t=0,0.074506,0.074506,1,0.053021,0.096092
+T5,True,Base,shared validation t*,0.037740,0.037740,1,0.013620,0.062145
+T5,True,Base,independent calibration t*,0.030206,0.030206,1,0.008893,0.051287
+T5,True,CE+soft kappa,t=0,0.021525,0.011466;0.029340;0.023768,3,0.007920,0.036202
+T5,True,CE+soft kappa,shared validation t*,0.017800,0.016538;0.017970;0.018890,3,0.003410,0.032161
+T5,True,CE+soft kappa,independent calibration t*,0.022179,0.021441;0.028421;0.016676,3,0.007145,0.037566
+T6,False,Base,t=0,0.000000,0.000000,0,0.000000,0.000000
+T6,False,Base,shared validation t*,0.000000,0.000000,0,0.000000,0.000000
+T6,False,Base,independent calibration t*,0.000000,0.000000,0,0.000000,0.000000
+T6,False,CE+soft kappa,t=0,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T6,False,CE+soft kappa,shared validation t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T6,False,CE+soft kappa,independent calibration t*,0.000000,0.000000;0.000000;0.000000,0,0.000000,0.000000
+T7,True,Base,t=0,-0.005683,-0.005683,0,-0.023566,0.012414
+T7,True,Base,shared validation t*,-0.012131,-0.012131,0,-0.034717,0.010067
+T7,True,Base,independent calibration t*,0.010708,0.010708,1,-0.010400,0.031825
+T7,True,CE+soft kappa,t=0,-0.001674,-0.006720;0.000677;0.001021,2,-0.015765,0.011311
+T7,True,CE+soft kappa,shared validation t*,0.003425,-0.005289;0.013846;0.001720,2,-0.010224,0.016028
+T7,True,CE+soft kappa,independent calibration t*,-0.007446,-0.007292;0.005151;-0.020198,1,-0.021138,0.005136

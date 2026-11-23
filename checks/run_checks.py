@@ -70,6 +70,16 @@ for s, meta in em["sets"].items():
     ok &= len(rows) == meta["rows"] and sum(r["esci"] == "E" for r in rows) == meta["E"] and len({(r["query_id"], r["product_id"]) for r in rows}) == len(rows)
 check("ESCI manifests: row counts, Relevant counts, unique (query, product)", ok)
 check("ESCI sizes of Table 1 (10,000 / 3,879 / 4,047 / 6,078; 5,000 / 200 / 200 / 300 queries)", [em["sets"][s]["rows"] for s in ("sft2", "diag", "sel", "test300")] == [10000, 3879, 4047, 6078] and [em["sets"][s]["queries"] for s in ("sft2", "diag", "sel", "test300")] == [5000, 200, 200, 300])
+check("ESCI independent calibration set: 200 queries / 3,939 rows / 1,682 Relevant", [em["sets"]["calib"][k] for k in ("queries", "rows", "E")] == [200, 3939, 1682])
+# warm-up: 10% of the 625 updates; MS MARCO trainers round(0.1 x 625) = 62 (warmup_ratio of the configs), ESCI trainers ceil(0.1 x 625) = 63 (fixed in the trainers)
+import math as _m
+import re as _re
+_esci_tr = ["esci_train.py", "esci_llama_train.py", "esci_loss_train_245.py", "esci_loss_train_384.py", "esci_llama_loss_train_mix.py", "esci_gemma_loss_train_mix.py"]
+_ok_w = round(0.1 * 625) == 62 and _m.ceil(0.1 * 625) == 63
+_ok_w &= all("ceil(0.1 * B)" in (ROOT / "methods" / f_).read_text(encoding="utf-8") for f_ in _esci_tr)
+_ok_w &= all('round(cfg["optim"]["warmup_ratio"] * total' in (ROOT / "methods" / f_).read_text(encoding="utf-8") for f_ in ("msm_llama_loss_train.py", "msm_gemma_loss_train.py", "train_apocf_online.py"))
+_ok_w = bool(_ok_w) and all(bool(_re.search(r"warmup_ratio:\s*0\.1", (ROOT / "configs" / c_).read_text(encoding="utf-8"))) for c_ in ("qwen3_4b_msm_loss.yaml", "llama31_8b_msm.yaml", "gemma3_4b_msm.yaml"))
+check("warm-up: MS MARCO 62 updates (round of 0.1 x 625 from warmup_ratio 0.1), ESCI 63 (ceil)", _ok_w)
 q_ids = {s: {r["query_id"] for r in csv.DictReader(open(M / f"esci_rows_{s}.csv", encoding="utf-8"))} for s in em["sets"]}
 names = list(q_ids)
 check("ESCI query ids disjoint across splits", all(not (q_ids[x] & q_ids[y]) for i, x in enumerate(names) for y in names[i + 1:]))

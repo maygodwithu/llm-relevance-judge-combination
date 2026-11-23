@@ -9,8 +9,8 @@ PY=${PY:-python}
 export HF_HUB_OFFLINE=1
 OUT=cpmr_experiment/esci393
 MAN=cpmr_experiment/esci_llama/p1_T2/esci_apocf_manifest.json
-CAL=$OUT/calib/calib_rows.jsonl
-CK=cpmr_experiment/esci_204/train/checkpoints
+CAL=cpmr_experiment/esci/audit/calib_rows.jsonl      # restored by scripts/restore_data.py esci
+CK=${CK:-cpmr_experiment/esci_llama/train/checkpoints}
 mkdir -p $OUT/eval $OUT/logs $OUT/gate $OUT/ckpt_maps
 log () { echo "$(date -u +%FT%T) $*" >> $OUT/scheduler.log; }
 mapA="{"; mapB="{"; sepA=""; sepB=""

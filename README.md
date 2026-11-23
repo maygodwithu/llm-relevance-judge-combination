@@ -37,6 +37,7 @@ conditions **Base**, **CE**, **CE+soft κ** ("S"), **CE+AnyLoss-style κ** ("A")
 
 * Python 3.12, `pip install -r requirements.txt` (versions used for the paper are listed there).
 * Models (Hugging Face): `Qwen/Qwen3-4B` (revision `1cfa9a7208912126459214e8b04321603b3df60c`), `meta-llama/Llama-3.1-8B-Instruct` (revision `0e9e39f249a16976918f6564b8830bc894c89659`, **gated: accept the Meta license**), `google/gemma-3-4b-it` (revision `093f9f388b31de276ce2de164bdc2081324b9767`, **gated: accept the Gemma terms**). The commands use `--local_files_only`; drop it if the models are not cached locally, and set `HF_HOME` / `HF_HUB_OFFLINE` as usual.
+* **Training settings** (all models): LoRA r 8 / α 16 / dropout 0.05 on the decoder q, k, v, o projections, AdamW, learning rate 2e-5, 625 updates with an effective batch of 16 sequences (ESCI: 16 rows; MS MARCO: 8 positive–negative pairs), warm-up over the first 10% of the updates followed by linear decay to 0, seeds 0 / 1 / 2, final checkpoint. Warm-up is **62 updates for MS MARCO** (`round(0.1 × 625)`, from `warmup_ratio: 0.1` in `configs/`) and **63 for ESCI** (`ceil(0.1 × 625)`, set in the ESCI trainers); the generated commands use these values without further arguments. Agreement-loss weight λ = 1, AnyLoss-style slope α = 10, denominator floor 1e-6; maximum input length 384 tokens for MS MARCO and 766 / 981 / 704 for ESCI (Qwen3-4B / Llama-3.1-8B / Gemma-3-4B).
 * Hardware used: NVIDIA RTX PRO 6000 Blackwell Server Edition (about 96 GB), BF16 blocks with FP32 final norm / head / log-softmax. Peak allocated memory of an ESCI κ run (Qwen3-4B, micro-batch 4) is about 42 GB; MS MARCO Qwen3-4B runs (gradient checkpointing) about 10 GB. Select the GPU with `CUDA_VISIBLE_DEVICES` (the generated commands take `--gpu`).
 * Roughly (one RTX PRO 6000): Qwen3-4B ESCI CE 11 min, CE+κ 38 min per run; ESCI evaluation about 3–4.5 min per checkpoint and set (validation / test). The full study is several hundred training runs (see `experiments/commands/`).
 
@@ -52,7 +53,7 @@ python scripts/restore_data.py msmarco-cache
 python scripts/verify_data.py
 ```
 
-`restore_data.py` does **no sampling**: it reads the row lists from `data/manifests/` and rebuilds the files the trainers read (`cpmr_experiment/esci/audit/{sft2,diag,sel,test300}_rows.jsonl`, `data/msmarco_train_v2_5k/pairs_text_basic_5000.jsonl`, `data/msmarco_po/val200/pairs_text_basic_seed0.jsonl`, `data/msmarco_po/diag200/pairs_text_basic_diag200.jsonl`, `data/scenarios/msmarco_trec{2019,2020}_bm25top100_pool.jsonl`) and compares every file with the recorded SHA-256 (ESCI row files and the MS MARCO pair files (training, val200, diag200) are byte-identical to the originals; the TREC-DL pool files contain the judged pairs only, which are the only pairs that enter an evaluation; their texts are checked pair by pair).
+`restore_data.py` does **no sampling**: it reads the row lists from `data/manifests/` and rebuilds the files the trainers read (`cpmr_experiment/esci/audit/{sft2,diag,sel,test300,calib}_rows.jsonl`, `data/msmarco_train_v2_5k/pairs_text_basic_5000.jsonl`, `data/msmarco_po/val200/pairs_text_basic_seed0.jsonl`, `data/msmarco_po/diag200/pairs_text_basic_diag200.jsonl`, `data/scenarios/msmarco_trec{2019,2020}_bm25top100_pool.jsonl`) and compares every file with the recorded SHA-256 (ESCI row files and the MS MARCO pair files (training, val200, diag200) are byte-identical to the originals; the TREC-DL pool files contain the judged pairs only, which are the only pairs that enter an evaluation; their texts are checked pair by pair).
 
 | set | queries | pairs | role |
 |---|---:|---:|---|
@@ -60,6 +61,7 @@ python scripts/verify_data.py
 | ESCI diagnostic (`diag`) | 200 | 3,879 | PO confusion matrix |
 | ESCI validation (`sel`) | 200 | 4,047 | PO selection and thresholds |
 | ESCI test (`test300`) | 300 | 6,078 | evaluation |
+| ESCI independent calibration (`calib`) | 200 | 3,939 | threshold selection in the independent-calibration check only (Appendix C) |
 | MS MARCO training | 5,000 | 10,000 (1 positive, 1 negative per query) | SFT |
 | MS MARCO PO diagnostic (`diag200`) | 200 | 400 (1 positive, 1 negative per query) | PO confusion matrix |
 | MS MARCO validation (`val200`) | 200 | 400 (1 positive, 1 negative per query) | PO selection and thresholds |
@@ -92,7 +94,7 @@ prints, in order, the training command (`methods/esci_loss_train_245.py --loss m
 | §6.3, App. B | threshold re-selection on 500 validation resamples and panels | `analysis/err63_main.py --kappa .../kappa_val200.pkl` (ESCI: the `sel` queries are resampled; MS MARCO: the 200 `val200` queries), `thrfig_plot.py`; the same MS MARCO resampling is in `po_val_analysis.py` |
 | App. B | Gemma FP32 evaluation | `experiments/commands/gemma_fp32.sh`, `analysis/err62_gemma.py`, `err63_gemma.py` |
 | App. B | ESCI objective pilot: λ ∈ {0.3, 1, 3}, α ∈ {5, 10, 20}, CE+label-margin BCE | `experiments/commands/pilot245.sh`, `analysis/esci245_analysis.py` |
-| App. B, C and the supplementary analyses | training budget, BCE / MAE controls, label length, seed and joint bootstrap, sampling and coverage, cross-year thresholds, independent calibration | see section 7 and `docs/ADDITIONAL_ANALYSES.md` |
+| App. B, C and the supplementary analyses | training budget, BCE / MAE controls, label length, seed and joint bootstrap, sampling and coverage, cross-year thresholds, independent calibration (ESCI Llama-3.1-8B, T1–T7) | see section 7 and `docs/ADDITIONAL_ANALYSES.md` |
 
 ## 6. Order of an analysis
 
@@ -120,7 +122,7 @@ python analysis/err63_main.py --root . --mods analysis --kappa cpmr_experiment/a
 * **Thresholds.** Main protocol: `val200` (MS MARCO) / `sel` (ESCI). The cross-year setting is supplementary; the kappa table passed with `--kappa` selects the mode (`kappa_val200.pkl` main, `kappa.pkl` cross-year), see section 6.
 * **Supplementary analyses** (training budget, BCE / MAE controls, label length, seed and joint bootstrap, sampling audit, cross-year, independent calibration) are kept apart from the main protocol: [`docs/ADDITIONAL_ANALYSES.md`](docs/ADDITIONAL_ANALYSES.md).
 * **Precision and determinism.** BF16 forward passes with FP32 head / log-softmax scoring. Training seeds, adapter initialization and example order are fixed, but GPU kernels are not bit-deterministic, so re-training changes the last digits; statistics on stored scores are deterministic.
-* **Checked.** `checks/run_checks.py` (CPU only); the restore of the MS MARCO inputs reproduces the original file hashes; the analysis scripts reproduce the paper's stored tables on the author's score files. **Not checked:** an end-to-end training run from a clean checkout, and the supplementary scripts from a clean checkout (the per-example scores are not distributed).
+* **Checks.** `checks/run_checks.py` (CPU only); the restore of the MS MARCO and ESCI inputs reproduces the original file hashes; the analysis scripts reproduce the paper's stored tables on the author's score files. The per-example scores are not distributed, so the analyses of stored scores start from the evaluation commands; a complete re-training from this repository has not been repeated.
 * **Compute.** The full study consists of several hundred training runs; the 5-run objective pilot took about 3.9 GPU-hours.
 
 ## 8. Sources and licenses of data and models

@@ -11,7 +11,7 @@ The first public version of the repository was built from an earlier state of th
 | PO scope | ESCI, T1–T3 | **Qwen3-4B and Llama-3.1-8B-Instruct, ESCI and MS MARCO, T1–T7** (no Gemma; PO before SFT only); selections and records for all 28 model–dataset–instruction cells in `cpmr_experiment/{esci_t,esci_llama,msm_po}/` and `docs/PO_SELECTION.md` |
 | PO commands | ESCI T1–T3 | `make_commands.py --paths po-base,po-ce,po-soft` covers the changed instructions of all four model–dataset combinations |
 | APO-CF meta-prompt | product (ESCI) domain only | product and passage (MS MARCO) domains; all 84 recorded meta-prompts are rebuilt byte for byte (`checks/run_checks.py`) |
-| supplementary analyses | Appendix B pilot only | `docs/ADDITIONAL_ANALYSES.md`, `analysis/supplementary/` |
+| supplementary analyses | Appendix B pilot only | `docs/ADDITIONAL_ANALYSES.md`, `analysis/supplementary/`, `results/independent_calibration/` |
 | internal wording | internal experiment-log numbers in comments and docstrings | removed; no behaviour of the code changed (see `CHANGES_FROM_ORIGINAL.md`) |
 
 The main MS MARCO tables of the revised manuscript use the `val200` threshold; the cross-year thresholds are reported only as the supplementary comparison of Appendix C.
