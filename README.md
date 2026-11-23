@@ -128,5 +128,3 @@ python analysis/err63_main.py --root . --mods analysis --kappa cpmr_experiment/a
 ## 8. Sources and licenses of data and models
 
 See `DATA_LICENSES.md`. ESCI (Amazon Shopping Queries Dataset, Apache-2.0), MS MARCO and TREC Deep Learning (research use terms of the collection owners) and the three models are **not** redistributed here and keep their own licenses and access conditions.
-
-The license of the code in this repository has **not been chosen yet**; until a `LICENSE` file is added, all rights are reserved by the author.

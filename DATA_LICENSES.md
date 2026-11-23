@@ -13,4 +13,3 @@ A few small files derived from the public datasets are kept because the analysis
 | Gemma-3-4B-it | https://huggingface.co/google/gemma-3-4b-it | Gemma Terms of Use (gated; accept on Hugging Face) |
 
 The APO-CF meta-prompt in `src/apocf_prompt.py` follows Choi (2025), *Applied Sciences* 15(9):5198, https://doi.org/10.3390/app15095198 (prompt strings of the original implementation, copied unchanged).
-The code license is not yet decided; see the end of `README.md`.
